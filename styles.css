@@ -1,3 +1,14 @@
 /* body {
   background-color: magenta;
 } */
+
+* {
+  margin: 0;
+}
+
+#editor {
+  height: 80vh;
+  width: 80vw;
+  border: solid 1px black;
+  margin: 20px;
+}
