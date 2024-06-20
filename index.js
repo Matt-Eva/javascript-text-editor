@@ -12,65 +12,68 @@ italicizeBtn.addEventListener("click", () => {
     const focusNode = currentSelection.focusNode;
     const range = document.createRange();
 
-    const position = anchorNode.compareDocumentPosition(focusNode);
+    if (focusNode === anchorNode) {
+    } else {
+      const position = anchorNode.compareDocumentPosition(focusNode);
 
-    if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-      console.log("focus node preceding anchor node");
-      range.setStart(focusNode, currentSelection.focusOffset);
-      range.setEnd(anchorNode, currentSelection.anchorOffset);
-    } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-      console.log("focus node following anchor node");
-      range.setStart(anchorNode, currentSelection.anchorOffset);
-      range.setEnd(focusNode, currentSelection.focusOffset);
-    }
-
-    let startContainer = range.startContainer;
-    for (let i = 0; i < 100; i++) {
-      startContainer = startContainer.parentNode;
-      if (startContainer.nextSibling) {
-        break;
+      if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+        console.log("focus node preceding anchor node");
+        range.setStart(focusNode, currentSelection.focusOffset);
+        range.setEnd(anchorNode, currentSelection.anchorOffset);
+      } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+        console.log("focus node following anchor node");
+        range.setStart(anchorNode, currentSelection.anchorOffset);
+        range.setEnd(focusNode, currentSelection.focusOffset);
       }
-    }
 
-    let endContainer = range.endContainer;
-    for (let i = 0; i < 100; i++) {
-      endContainer = endContainer.parentNode;
-      if (endContainer.previousSibling) {
-        break;
+      let startContainer = range.startContainer;
+      for (let i = 0; i < 100; i++) {
+        startContainer = startContainer.parentNode;
+        if (startContainer.nextSibling) {
+          break;
+        }
       }
-    }
 
-    let node = startContainer;
-    const nodeArray = [node];
-
-    for (let i = 0; i < 100; i++) {
-      node = node.nextSibling;
-      nodeArray.push(node);
-      if (node == endContainer) {
-        break;
+      let endContainer = range.endContainer;
+      for (let i = 0; i < 100; i++) {
+        endContainer = endContainer.parentNode;
+        if (endContainer.previousSibling) {
+          break;
+        }
       }
-    }
 
-    for (let node of nodeArray) {
-      const textContent = node.textContent;
-      const em = document.createElement("em");
-      if (node === startContainer) {
-        const before = textContent.slice(0, range.startOffset);
-        const modified = textContent.slice(range.startOffset);
-        em.textContent = modified;
-        node.textContent = before;
-        node.appendChild(em);
-      } else if (node === endContainer) {
-        const modified = textContent.slice(0, range.endOffset);
-        const after = textContent.slice(range.endOffset);
-        em.textContent = modified;
-        const textNode = document.createTextNode(after);
-        node.textContent = "";
-        node.append(em, textNode);
-      } else {
-        em.textContent = textContent;
-        node.textContent = "";
-        node.appendChild(em);
+      let node = startContainer;
+      const nodeArray = [node];
+
+      for (let i = 0; i < 100; i++) {
+        node = node.nextSibling;
+        nodeArray.push(node);
+        if (node == endContainer) {
+          break;
+        }
+      }
+
+      for (let node of nodeArray) {
+        const textContent = node.textContent;
+        const em = document.createElement("em");
+        if (node === startContainer) {
+          const before = textContent.slice(0, range.startOffset);
+          const modified = textContent.slice(range.startOffset);
+          em.textContent = modified;
+          node.textContent = before;
+          node.appendChild(em);
+        } else if (node === endContainer) {
+          const modified = textContent.slice(0, range.endOffset);
+          const after = textContent.slice(range.endOffset);
+          em.textContent = modified;
+          const textNode = document.createTextNode(after);
+          node.textContent = "";
+          node.append(em, textNode);
+        } else {
+          em.textContent = textContent;
+          node.textContent = "";
+          node.appendChild(em);
+        }
       }
     }
   }
