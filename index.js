@@ -67,6 +67,10 @@ italicizeBtn.addEventListener("click", () => {
         const textNode = document.createTextNode(after);
         node.textContent = "";
         node.append(em, textNode);
+      } else {
+        em.textContent = textContent;
+        node.textContent = "";
+        node.appendChild(em);
       }
     }
   }
