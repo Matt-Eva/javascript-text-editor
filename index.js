@@ -52,14 +52,21 @@ italicizeBtn.addEventListener("click", () => {
     }
 
     for (let node of nodeArray) {
+      const textContent = node.textContent;
+      const em = document.createElement("em");
       if (node === startContainer) {
-        const textContent = node.textContent;
         const before = textContent.slice(0, range.startOffset);
-        const after = textContent.slice(range.startOffset);
-        const em = document.createElement("em");
-        em.textContent = after;
+        const modified = textContent.slice(range.startOffset);
+        em.textContent = modified;
         node.textContent = before;
         node.appendChild(em);
+      } else if (node === endContainer) {
+        const modified = textContent.slice(0, range.endOffset);
+        const after = textContent.slice(range.endOffset);
+        em.textContent = modified;
+        const textNode = document.createTextNode(after);
+        node.textContent = "";
+        node.append(em, textNode);
       }
     }
   }
