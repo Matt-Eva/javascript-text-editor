@@ -7,23 +7,52 @@ let focusedElement;
 let currentSelection;
 
 italicizeBtn.addEventListener("click", () => {
-  if (currentSelection) {
+  if (currentSelection && !currentSelection.isCollapsed) {
     const anchorNode = currentSelection.anchorNode;
     const focusNode = currentSelection.focusNode;
+    const focusOffset = currentSelection.focusOffset;
+    const anchorOffset = currentSelection.anchorOffset;
     const range = document.createRange();
 
     if (focusNode === anchorNode) {
+      let node = focusNode;
+      const textContent = node.textContent;
+      let before = "";
+      let modified = "";
+      let after = "";
+
+      if (focusOffset > anchorOffset) {
+        before = textContent.slice(0, anchorOffset);
+        modified = textContent.slice(anchorOffset, focusOffset);
+        after = textContent.slice(focusOffset);
+      } else {
+        before = textContent.slice(0, focusOffset);
+        modified = textContent.slice(focusOffset, anchorOffset);
+        after = textContent.slice(anchorOffset);
+      }
+
+      const em = document.createElement("em");
+      em.textContent = modified;
+      const beforeNode = document.createTextNode(before);
+      const afterNode = document.createTextNode(after);
+
+      while (node.nodeName === "#text") {
+        node = node.parentNode;
+      }
+
+      node.textContent = "";
+      node.append(beforeNode, em, afterNode);
     } else {
       const position = anchorNode.compareDocumentPosition(focusNode);
 
       if (position & Node.DOCUMENT_POSITION_PRECEDING) {
         console.log("focus node preceding anchor node");
-        range.setStart(focusNode, currentSelection.focusOffset);
-        range.setEnd(anchorNode, currentSelection.anchorOffset);
+        range.setStart(focusNode, focusOffset);
+        range.setEnd(anchorNode, anchorOffset);
       } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
         console.log("focus node following anchor node");
-        range.setStart(anchorNode, currentSelection.anchorOffset);
-        range.setEnd(focusNode, currentSelection.focusOffset);
+        range.setStart(anchorNode, anchorOffset);
+        range.setEnd(focusNode, focusOffset);
       }
 
       let startContainer = range.startContainer;
