@@ -9,59 +9,24 @@ let focusedElement;
 let currentSelection;
 
 italicizeBtn.addEventListener("click", () => {
-  console.log(currentSelection);
   if (currentSelection) {
     const anchorNode = currentSelection.anchorNode;
     const focusNode = currentSelection.focusNode;
+    const range = document.createRange();
 
     const position = anchorNode.compareDocumentPosition(focusNode);
 
     if (position & Node.DOCUMENT_POSITION_PRECEDING) {
       console.log("focus node preceding anchor node");
+      range.setStart(focusNode, currentSelection.focusOffset);
+      range.setEnd(anchorNode, currentSelection.anchorOffset);
     } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
       console.log("focus node following anchor node");
+      range.setStart(anchorNode, currentSelection.anchorOffset);
+      range.setEnd(focusNode, currentSelection.focusOffset);
     }
-  }
-});
 
-editor.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-  if (!selection.isCollapsed) {
-    currentSelection = selection;
-  }
-});
-
-editor.addEventListener("mousedown", (e) => {
-  const children = editor.childNodes;
-
-  if (children.length > 0 && children[0].nodeName === "#text") {
-    const p = document.createElement("p");
-    p.textContent = children[0].textContent;
-    editor.replaceChild(p, children[0]);
-
-    if (children.length === 1) {
-      focusedElement = p;
-    } else if (e.target.id !== editor.id) {
-      focusedElement = e.target;
-    }
-  } else if (e.target.id !== editor.id) {
-    focusedElement = e.target;
-  }
-});
-
-headerBtn.addEventListener("click", (e) => {
-  if (focusedElement) {
-    if (focusedElement.nodeName === "H2") {
-      const p = document.createElement("p");
-      p.textContent = focusedElement.textContent;
-      editor.replaceChild(p, focusedElement);
-      focusedElement = p;
-    } else {
-      const header = document.createElement("h2");
-      header.textContent = focusedElement.textContent;
-      editor.replaceChild(header, focusedElement);
-      focusedElement = header;
-    }
+    const fragment = range.extractContents();
   }
 });
 
@@ -125,3 +90,43 @@ headerBtn.addEventListener("click", (e) => {
 //     range.insertNode(fragment);
 //   }
 // });
+editor.addEventListener("mouseup", () => {
+  const selection = window.getSelection();
+  if (!selection.isCollapsed) {
+    currentSelection = selection;
+  }
+});
+
+editor.addEventListener("mousedown", (e) => {
+  const children = editor.childNodes;
+
+  if (children.length > 0 && children[0].nodeName === "#text") {
+    const p = document.createElement("p");
+    p.textContent = children[0].textContent;
+    editor.replaceChild(p, children[0]);
+
+    if (children.length === 1) {
+      focusedElement = p;
+    } else if (e.target.id !== editor.id) {
+      focusedElement = e.target;
+    }
+  } else if (e.target.id !== editor.id) {
+    focusedElement = e.target;
+  }
+});
+
+headerBtn.addEventListener("click", (e) => {
+  if (focusedElement) {
+    if (focusedElement.nodeName === "H2") {
+      const p = document.createElement("p");
+      p.textContent = focusedElement.textContent;
+      editor.replaceChild(p, focusedElement);
+      focusedElement = p;
+    } else {
+      const header = document.createElement("h2");
+      header.textContent = focusedElement.textContent;
+      editor.replaceChild(header, focusedElement);
+      focusedElement = header;
+    }
+  }
+});
