@@ -51,12 +51,16 @@ italicizeBtn.addEventListener("click", () => {
       }
     }
 
-    for (const node of nodeArray) {
-      const textContent = node.textContent;
-      const em = document.createElement("em");
-      em.textContent = textContent;
-      node.textContent = "";
-      node.appendChild(em);
+    for (let node of nodeArray) {
+      if (node === startContainer) {
+        const textContent = node.textContent;
+        const before = textContent.slice(0, range.startOffset);
+        const after = textContent.slice(range.startOffset);
+        const em = document.createElement("em");
+        em.textContent = after;
+        node.textContent = before;
+        node.appendChild(em);
+      }
     }
   }
 });
