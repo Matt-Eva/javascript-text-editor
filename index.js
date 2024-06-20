@@ -53,6 +53,10 @@ italicizeBtn.addEventListener("click", () => {
         console.log("focus node following anchor node");
         range.setStart(anchorNode, anchorOffset);
         range.setEnd(focusNode, focusOffset);
+      } else if (position & Node.DOCUMENT_POSITION_CONTAINS) {
+        console.log("focus node contains anchor node");
+      } else if (position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
+        console.log("anchor node contains focus node");
       }
 
       let startContainer = range.startContainer;
@@ -75,6 +79,7 @@ italicizeBtn.addEventListener("click", () => {
       const nodeArray = [node];
 
       for (let i = 0; i < 100; i++) {
+        console.log(node);
         node = node.nextSibling;
         nodeArray.push(node);
         if (node == endContainer) {
