@@ -26,7 +26,20 @@ italicizeBtn.addEventListener("click", () => {
       range.setEnd(focusNode, currentSelection.focusOffset);
     }
 
+    console.log(anchorNode.nextSibling);
+
     const fragment = range.extractContents();
+    console.log(fragment.children);
+
+    for (const child of fragment.children) {
+      const textContent = child.textContent;
+      const em = document.createElement("em");
+      em.textContent = textContent;
+      child.textContent = "";
+      child.appendChild(em);
+    }
+
+    range.insertNode(fragment);
   }
 });
 
