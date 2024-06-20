@@ -1,5 +1,3 @@
-// console.log("hello world!");
-
 const editor = document.getElementById("editor");
 const headerBtn = document.getElementById("headerBtn");
 const italicizeBtn = document.getElementById("italicize");
@@ -27,16 +25,20 @@ italicizeBtn.addEventListener("click", () => {
     }
 
     let startContainer = range.startContainer;
-    while (!startContainer.nextSibling) {
+    for (let i = 0; i < 100; i++) {
       startContainer = startContainer.parentNode;
+      if (startContainer.nextSibling) {
+        break;
+      }
     }
 
     let endContainer = range.endContainer;
-    while (!endContainer.previousSibling) {
+    for (let i = 0; i < 100; i++) {
       endContainer = endContainer.parentNode;
+      if (endContainer.previousSibling) {
+        break;
+      }
     }
-
-    console.log(endContainer.previousSibling === startContainer.nextSibling);
 
     let node = startContainer;
     const nodeArray = [node];
@@ -49,10 +51,13 @@ italicizeBtn.addEventListener("click", () => {
       }
     }
 
-    console.log(nodeArray);
-
-    console.log("next Sibling", startContainer.nextSibling);
-    console.log("previous sibling", endContainer.previousSibling);
+    for (const node of nodeArray) {
+      const textContent = node.textContent;
+      const em = document.createElement("em");
+      em.textContent = textContent;
+      node.textContent = "";
+      node.appendChild(em);
+    }
   }
 });
 
