@@ -26,7 +26,33 @@ italicizeBtn.addEventListener("click", () => {
       range.setEnd(focusNode, currentSelection.focusOffset);
     }
 
-    console.log(anchorNode.nextSibling);
+    let startContainer = range.startContainer;
+    while (!startContainer.nextSibling) {
+      startContainer = startContainer.parentNode;
+    }
+
+    let endContainer = range.endContainer;
+    while (!endContainer.previousSibling) {
+      endContainer = endContainer.parentNode;
+    }
+
+    console.log(endContainer.previousSibling === startContainer.nextSibling);
+
+    let node = startContainer;
+    const nodeArray = [node];
+
+    for (let i = 0; i < 100; i++) {
+      node = node.nextSibling;
+      nodeArray.push(node);
+      if (node == endContainer) {
+        break;
+      }
+    }
+
+    console.log(nodeArray);
+
+    console.log("next Sibling", startContainer.nextSibling);
+    console.log("previous sibling", endContainer.previousSibling);
   }
 });
 
