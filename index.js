@@ -10,6 +10,13 @@ italicizeBtn.addEventListener("click", () => {
   if (currentSelection && !currentSelection.isCollapsed) {
     const anchorNode = currentSelection.anchorNode;
     const focusNode = currentSelection.focusNode;
+    console.log(anchorNode.nodeName, focusNode.nodeName);
+    console.log("nextSibling", anchorNode.nextSibling, focusNode.nextSibling);
+    console.log(
+      "previousSibling",
+      anchorNode.previousSibling,
+      focusNode.previousSibling
+    );
     const focusOffset = currentSelection.focusOffset;
     const anchorOffset = currentSelection.anchorOffset;
     const range = document.createRange();
@@ -43,20 +50,41 @@ italicizeBtn.addEventListener("click", () => {
       node.textContent = "";
       node.append(beforeNode, em, afterNode);
     } else {
+      let anchorParent = anchorNode.parentNode;
+      let focusParent = focusNode.parentNode;
+
+      while (
+        anchorParent !== focusParent &&
+        (anchorParent.parentNode !== editor ||
+          focusParent.parentNode !== editor)
+      ) {
+        if (anchorParent.parentNode !== editor) {
+          anchorParent = anchorParent.parentNode;
+        }
+
+        if (focusParent.parentNode !== editor) {
+          focusParent = focusParent.parentNode;
+        }
+      }
+
+      if (anchorParent === focusParent) {
+        // console.log("same parent node");
+      }
+
       const position = anchorNode.compareDocumentPosition(focusNode);
 
       if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-        console.log("focus node preceding anchor node");
+        // console.log("focus node preceding anchor node");
         range.setStart(focusNode, focusOffset);
         range.setEnd(anchorNode, anchorOffset);
       } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-        console.log("focus node following anchor node");
+        // console.log("focus node following anchor node");
         range.setStart(anchorNode, anchorOffset);
         range.setEnd(focusNode, focusOffset);
       } else if (position & Node.DOCUMENT_POSITION_CONTAINS) {
-        console.log("focus node contains anchor node");
+        // console.log("focus node contains anchor node");
       } else if (position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-        console.log("anchor node contains focus node");
+        // console.log("anchor node contains focus node");
       }
 
       let startContainer = range.startContainer;
@@ -79,7 +107,7 @@ italicizeBtn.addEventListener("click", () => {
       const nodeArray = [node];
 
       for (let i = 0; i < 100; i++) {
-        console.log(node);
+        // console.log(node);
         node = node.nextSibling;
         nodeArray.push(node);
         if (node == endContainer) {
