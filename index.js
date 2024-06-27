@@ -3,8 +3,33 @@ const headerBtn = document.getElementById("headerBtn");
 const italicizeBtn = document.getElementById("italicize");
 const clickHeader = document.getElementById("clickHeader");
 
-let focusedElement;
+let focusedNode;
 let currentSelection;
+
+editor.addEventListener("mouseup", () => {
+  const selection = window.getSelection();
+  if (!selection.isCollapsed) {
+    currentSelection = selection;
+  }
+});
+
+editor.addEventListener("mousedown", (e) => {
+  const children = editor.childNodes;
+  console.log(children);
+
+  if (children.length > 0 && children[0].nodeName === "#text") {
+    const p = document.createElement("p");
+    p.textContent = children[0].textContent;
+    editor.replaceChild(p, children[0]);
+    children[0] = p;
+    console.log(children);
+
+    if (children.length === 1) {
+      focusedNode = p;
+    }
+  }
+  console.log(focusedNode);
+});
 
 italicizeBtn.addEventListener("click", () => {
   if (currentSelection && !currentSelection.isCollapsed) {
@@ -201,30 +226,6 @@ italicizeBtn.addEventListener("click", () => {
 //     range.insertNode(fragment);
 //   }
 // });
-editor.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-  if (!selection.isCollapsed) {
-    currentSelection = selection;
-  }
-});
-
-editor.addEventListener("mousedown", (e) => {
-  const children = editor.childNodes;
-
-  if (children.length > 0 && children[0].nodeName === "#text") {
-    const p = document.createElement("p");
-    p.textContent = children[0].textContent;
-    editor.replaceChild(p, children[0]);
-
-    if (children.length === 1) {
-      focusedElement = p;
-    } else if (e.target.id !== editor.id) {
-      focusedElement = e.target;
-    }
-  } else if (e.target.id !== editor.id) {
-    focusedElement = e.target;
-  }
-});
 
 headerBtn.addEventListener("click", (e) => {
   if (focusedElement) {
