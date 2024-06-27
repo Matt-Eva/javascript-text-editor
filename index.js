@@ -3,7 +3,7 @@ const headerBtn = document.getElementById("headerBtn");
 const italicizeBtn = document.getElementById("italicize");
 const clickHeader = document.getElementById("clickHeader");
 
-let focusedNode;
+let focusedNode = editor;
 let currentSelection;
 
 editor.addEventListener("mouseup", () => {
@@ -13,158 +13,188 @@ editor.addEventListener("mouseup", () => {
   }
 });
 
-editor.addEventListener("mousedown", (e) => {
-  const children = editor.childNodes;
-  console.log(children);
+editor.addEventListener("keyup", handleFocusNode);
+editor.addEventListener("mousedown", handleFocusNode);
 
-  if (children.length > 0 && children[0].nodeName === "#text") {
-    const p = document.createElement("p");
-    p.textContent = children[0].textContent;
-    editor.replaceChild(p, children[0]);
-    children[0] = p;
-    console.log(children);
+function handleFocusNode(e) {
+  const selection = window.getSelection();
+  const anchorNode = selection.anchorNode;
+  focusedNode = anchorNode;
 
-    if (children.length === 1) {
+  if (editor.childNodes.length === 0) {
+    setTimeout(() => {
+      if (editor.childNodes.length !== 0) {
+        focusedNode = editor.childNodes[0];
+      }
+    }, 1);
+  }
+
+  if (e.type === "mousedown") {
+    const childNodes = editor.childNodes;
+    for (const child of childNodes) {
+      if (child.nodeName === "#text") {
+        const p = document.createElement("p");
+        p.textContent = child.textContent;
+        editor.replaceChild(p, child);
+      }
+    }
+  }
+}
+
+headerBtn.addEventListener("click", (e) => {
+  if (focusedNode !== editor) {
+    console.log(editor.childNodes);
+    if (focusedNode.nodeName === "H2") {
+      const p = document.createElement("p");
+      p.textContent = focusedNode.textContent;
+      editor.replaceChild(p, focusedNode);
       focusedNode = p;
-    }
-  }
-  console.log(focusedNode);
-});
-
-italicizeBtn.addEventListener("click", () => {
-  if (currentSelection && !currentSelection.isCollapsed) {
-    const anchorNode = currentSelection.anchorNode;
-    const focusNode = currentSelection.focusNode;
-    console.log(anchorNode.nodeName, focusNode.nodeName);
-    console.log("nextSibling", anchorNode.nextSibling, focusNode.nextSibling);
-    console.log(
-      "previousSibling",
-      anchorNode.previousSibling,
-      focusNode.previousSibling
-    );
-    const focusOffset = currentSelection.focusOffset;
-    const anchorOffset = currentSelection.anchorOffset;
-    const range = document.createRange();
-
-    if (focusNode === anchorNode) {
-      let node = focusNode;
-      const textContent = node.textContent;
-      let before = "";
-      let modified = "";
-      let after = "";
-
-      if (focusOffset > anchorOffset) {
-        before = textContent.slice(0, anchorOffset);
-        modified = textContent.slice(anchorOffset, focusOffset);
-        after = textContent.slice(focusOffset);
-      } else {
-        before = textContent.slice(0, focusOffset);
-        modified = textContent.slice(focusOffset, anchorOffset);
-        after = textContent.slice(anchorOffset);
-      }
-
-      const em = document.createElement("em");
-      em.textContent = modified;
-      const beforeNode = document.createTextNode(before);
-      const afterNode = document.createTextNode(after);
-
-      while (node.nodeName === "#text") {
-        node = node.parentNode;
-      }
-
-      node.textContent = "";
-      node.append(beforeNode, em, afterNode);
     } else {
-      let anchorParent = anchorNode.parentNode;
-      let focusParent = focusNode.parentNode;
-
-      while (
-        anchorParent !== focusParent &&
-        (anchorParent.parentNode !== editor ||
-          focusParent.parentNode !== editor)
-      ) {
-        if (anchorParent.parentNode !== editor) {
-          anchorParent = anchorParent.parentNode;
-        }
-
-        if (focusParent.parentNode !== editor) {
-          focusParent = focusParent.parentNode;
-        }
-      }
-
-      if (anchorParent === focusParent) {
-        // console.log("same parent node");
-      }
-
-      const position = anchorNode.compareDocumentPosition(focusNode);
-
-      if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-        // console.log("focus node preceding anchor node");
-        range.setStart(focusNode, focusOffset);
-        range.setEnd(anchorNode, anchorOffset);
-      } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-        // console.log("focus node following anchor node");
-        range.setStart(anchorNode, anchorOffset);
-        range.setEnd(focusNode, focusOffset);
-      } else if (position & Node.DOCUMENT_POSITION_CONTAINS) {
-        // console.log("focus node contains anchor node");
-      } else if (position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-        // console.log("anchor node contains focus node");
-      }
-
-      let startContainer = range.startContainer;
-      for (let i = 0; i < 100; i++) {
-        startContainer = startContainer.parentNode;
-        if (startContainer.nextSibling) {
-          break;
-        }
-      }
-
-      let endContainer = range.endContainer;
-      for (let i = 0; i < 100; i++) {
-        endContainer = endContainer.parentNode;
-        if (endContainer.previousSibling) {
-          break;
-        }
-      }
-
-      let node = startContainer;
-      const nodeArray = [node];
-
-      for (let i = 0; i < 100; i++) {
-        // console.log(node);
-        node = node.nextSibling;
-        nodeArray.push(node);
-        if (node == endContainer) {
-          break;
-        }
-      }
-
-      for (let node of nodeArray) {
-        const textContent = node.textContent;
-        const em = document.createElement("em");
-        if (node === startContainer) {
-          const before = textContent.slice(0, range.startOffset);
-          const modified = textContent.slice(range.startOffset);
-          em.textContent = modified;
-          node.textContent = before;
-          node.appendChild(em);
-        } else if (node === endContainer) {
-          const modified = textContent.slice(0, range.endOffset);
-          const after = textContent.slice(range.endOffset);
-          em.textContent = modified;
-          const textNode = document.createTextNode(after);
-          node.textContent = "";
-          node.append(em, textNode);
-        } else {
-          em.textContent = textContent;
-          node.textContent = "";
-          node.appendChild(em);
-        }
-      }
+      console.log(focusedNode);
+      const header = document.createElement("h2");
+      header.textContent = focusedNode.textContent;
+      editor.replaceChild(header, focusedNode);
+      focusedNode = header;
     }
   }
 });
+
+//
+
+// italicizeBtn.addEventListener("click", () => {
+//   if (currentSelection && !currentSelection.isCollapsed) {
+//     const anchorNode = currentSelection.anchorNode;
+//     const focusNode = currentSelection.focusNode;
+//     console.log(anchorNode.nodeName, focusNode.nodeName);
+//     console.log("nextSibling", anchorNode.nextSibling, focusNode.nextSibling);
+//     console.log(
+//       "previousSibling",
+//       anchorNode.previousSibling,
+//       focusNode.previousSibling
+//     );
+//     const focusOffset = currentSelection.focusOffset;
+//     const anchorOffset = currentSelection.anchorOffset;
+//     const range = document.createRange();
+
+//     if (focusNode === anchorNode) {
+//       let node = focusNode;
+//       const textContent = node.textContent;
+//       let before = "";
+//       let modified = "";
+//       let after = "";
+
+//       if (focusOffset > anchorOffset) {
+//         before = textContent.slice(0, anchorOffset);
+//         modified = textContent.slice(anchorOffset, focusOffset);
+//         after = textContent.slice(focusOffset);
+//       } else {
+//         before = textContent.slice(0, focusOffset);
+//         modified = textContent.slice(focusOffset, anchorOffset);
+//         after = textContent.slice(anchorOffset);
+//       }
+
+//       const em = document.createElement("em");
+//       em.textContent = modified;
+//       const beforeNode = document.createTextNode(before);
+//       const afterNode = document.createTextNode(after);
+
+//       while (node.nodeName === "#text") {
+//         node = node.parentNode;
+//       }
+
+//       node.textContent = "";
+//       node.append(beforeNode, em, afterNode);
+//     } else {
+//       let anchorParent = anchorNode.parentNode;
+//       let focusParent = focusNode.parentNode;
+
+//       while (
+//         anchorParent !== focusParent &&
+//         (anchorParent.parentNode !== editor ||
+//           focusParent.parentNode !== editor)
+//       ) {
+//         if (anchorParent.parentNode !== editor) {
+//           anchorParent = anchorParent.parentNode;
+//         }
+
+//         if (focusParent.parentNode !== editor) {
+//           focusParent = focusParent.parentNode;
+//         }
+//       }
+
+//       if (anchorParent === focusParent) {
+//         // console.log("same parent node");
+//       }
+
+//       const position = anchorNode.compareDocumentPosition(focusNode);
+
+//       if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+//         // console.log("focus node preceding anchor node");
+//         range.setStart(focusNode, focusOffset);
+//         range.setEnd(anchorNode, anchorOffset);
+//       } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+//         // console.log("focus node following anchor node");
+//         range.setStart(anchorNode, anchorOffset);
+//         range.setEnd(focusNode, focusOffset);
+//       } else if (position & Node.DOCUMENT_POSITION_CONTAINS) {
+//         // console.log("focus node contains anchor node");
+//       } else if (position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
+//         // console.log("anchor node contains focus node");
+//       }
+
+//       let startContainer = range.startContainer;
+//       for (let i = 0; i < 100; i++) {
+//         startContainer = startContainer.parentNode;
+//         if (startContainer.nextSibling) {
+//           break;
+//         }
+//       }
+
+//       let endContainer = range.endContainer;
+//       for (let i = 0; i < 100; i++) {
+//         endContainer = endContainer.parentNode;
+//         if (endContainer.previousSibling) {
+//           break;
+//         }
+//       }
+
+//       let node = startContainer;
+//       const nodeArray = [node];
+
+//       for (let i = 0; i < 100; i++) {
+//         // console.log(node);
+//         node = node.nextSibling;
+//         nodeArray.push(node);
+//         if (node == endContainer) {
+//           break;
+//         }
+//       }
+
+//       for (let node of nodeArray) {
+//         const textContent = node.textContent;
+//         const em = document.createElement("em");
+//         if (node === startContainer) {
+//           const before = textContent.slice(0, range.startOffset);
+//           const modified = textContent.slice(range.startOffset);
+//           em.textContent = modified;
+//           node.textContent = before;
+//           node.appendChild(em);
+//         } else if (node === endContainer) {
+//           const modified = textContent.slice(0, range.endOffset);
+//           const after = textContent.slice(range.endOffset);
+//           em.textContent = modified;
+//           const textNode = document.createTextNode(after);
+//           node.textContent = "";
+//           node.append(em, textNode);
+//         } else {
+//           em.textContent = textContent;
+//           node.textContent = "";
+//           node.appendChild(em);
+//         }
+//       }
+//     }
+//   }
+// });
 
 // editor.addEventListener("mouseup", (e) => {
 //   console.log("mouseup");
@@ -226,19 +256,3 @@ italicizeBtn.addEventListener("click", () => {
 //     range.insertNode(fragment);
 //   }
 // });
-
-headerBtn.addEventListener("click", (e) => {
-  if (focusedElement) {
-    if (focusedElement.nodeName === "H2") {
-      const p = document.createElement("p");
-      p.textContent = focusedElement.textContent;
-      editor.replaceChild(p, focusedElement);
-      focusedElement = p;
-    } else {
-      const header = document.createElement("h2");
-      header.textContent = focusedElement.textContent;
-      editor.replaceChild(header, focusedElement);
-      focusedElement = header;
-    }
-  }
-});
