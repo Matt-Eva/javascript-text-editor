@@ -10,7 +10,9 @@ Features include making headers, italicizing, bolding, and underlining text, cen
 
 - Things we need to account for
 
-[]
+[x]Turn First Text Node Into Paragraph
+[x]Apply Header Styling
+[x]Preserve Formatting Across Header Changes
 
 - Applying formatting across multiple paragraphs
 - Applying formatting within the same paragraph

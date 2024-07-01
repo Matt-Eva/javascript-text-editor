@@ -19,7 +19,10 @@ editor.addEventListener("mousedown", handleFocusNode);
 function handleFocusNode(e) {
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
-  focusedNode = anchorNode;
+  if (anchorNode !== editor) {
+    focusedNode = anchorNode;
+  }
+  console.log(focusedNode);
 
   if (editor.childNodes.length === 0) {
     setTimeout(() => {
@@ -32,7 +35,6 @@ function handleFocusNode(e) {
   if (e.type === "mousedown") {
     const childNodes = editor.childNodes;
     const child = childNodes[0];
-    console.log(child);
     if (child && child.nodeName === "#text") {
       const p = document.createElement("p");
       p.textContent = child.textContent;
@@ -60,6 +62,12 @@ headerBtn.addEventListener("click", (e) => {
 
       editor.replaceChild(p, focusedNode);
       focusedNode = p;
+    } else if (focusedNode.nodeName === "#text") {
+      const header = document.createElement("h2");
+      header.textContent = focusedNode.textContent;
+
+      editor.replaceChild(header, focusedNode);
+      focusedNode = header;
     } else {
       const header = document.createElement("h2");
       const childArray = [...focusedNode.childNodes];
