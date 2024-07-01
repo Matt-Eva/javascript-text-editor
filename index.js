@@ -1,7 +1,8 @@
 const editor = document.getElementById("editor");
 const headerBtn = document.getElementById("headerBtn");
 const italicizeBtn = document.getElementById("italicize");
-const clickHeader = document.getElementById("clickHeader");
+const boldBtn = document.getElementById("bold");
+const underlineBtn = document.getElementById("underline");
 
 let focusedNode = editor;
 let currentSelection;
@@ -19,10 +20,10 @@ editor.addEventListener("mousedown", handleFocusNode);
 function handleFocusNode(e) {
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
+
   if (anchorNode !== editor) {
     focusedNode = anchorNode;
   }
-  console.log(focusedNode);
 
   if (editor.childNodes.length === 0) {
     setTimeout(() => {
@@ -35,12 +36,15 @@ function handleFocusNode(e) {
   if (e.type === "mousedown") {
     const childNodes = editor.childNodes;
     const child = childNodes[0];
+
     if (child && child.nodeName === "#text") {
       const p = document.createElement("p");
       p.textContent = child.textContent;
+
       if (focusedNode === child) {
         focusedNode = p;
       }
+
       editor.replaceChild(p, child);
     }
   }
@@ -81,6 +85,80 @@ headerBtn.addEventListener("click", (e) => {
     }
   }
 });
+
+function checkSameParentNode(anchorNode, focusNode) {
+  anchorParent = anchorNode.parentNode;
+  focusParent = focusNode.parentNode;
+  while (anchorParent.parentNode !== editor) {
+    anchorParent = anchorParent.parentNode;
+  }
+
+  while (focusParent.parentNode !== editor) {
+    focusParent = focusParent.parentNode;
+  }
+
+  return focusParent === anchorParent;
+}
+
+italicizeBtn.addEventListener("click", () => {
+  if (currentSelection && !currentSelection.isCollapsed) {
+    let anchorNode = currentSelection.anchorNode;
+    let focusNode = currentSelection.focusNode;
+    const sameParent = checkSameParentNode(anchorNode, focusNode);
+    console.log("same parent", sameParent);
+
+    if (sameParent) {
+      formatSameParent(anchorNode, focusNode);
+    } else {
+      formatSeparateParent();
+    }
+  }
+});
+
+function formatSameParent(anchorNode, focusNode) {
+  anchorNode.textContent = "hello!!";
+  console.log("anchor node", anchorNode);
+  console.log("focus node", focusNode);
+
+  while (
+    !anchorNode.nextSibling &&
+    anchorNode.parentNode.parentNode !== editor
+  ) {
+    anchorNode = anchorNode.parentNode;
+  }
+  while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
+    focusNode = focusNode.parentNode;
+  }
+  console.log("anchorNode next sibling", anchorNode.nextSibling);
+  console.log("focusNode next sibling", focusNode.nextSibling);
+  console.log("anchor node", anchorNode);
+  console.log("focus node", focusNode);
+  console.log("focusNode textcontent", focusNode.textContent);
+  console.log("focusNode innertext", focusNode.innerText);
+  console.log("anchorNode textcontent", anchorNode.textContent);
+  console.log("anchorNode innertext", anchorNode.innerText);
+
+  const position = anchorNode.compareDocumentPosition(focusNode);
+  const nodeArray = [];
+
+  if (anchorNode === focusNode) {
+    nodeArray.push(focusNode);
+  } else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+    let node = focusNode;
+    while (node !== anchorNode) {
+      nodeArray.push(node);
+      node = node.nextSibling;
+    }
+  } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+    let node = anchorNode;
+    while (node !== focusNode) {
+      nodeArray.push(node);
+      node = node.nextSibling;
+    }
+  }
+}
+
+function formatSeparateParent() {}
 
 //
 

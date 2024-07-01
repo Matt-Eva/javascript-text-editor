@@ -13,6 +13,7 @@ Features include making headers, italicizing, bolding, and underlining text, cen
 [x]Turn First Text Node Into Paragraph
 [x]Apply Header Styling
 [x]Preserve Formatting Across Header Changes
+[]Apply Cross Formatting Within Same Paragraph
 
 - Applying formatting across multiple paragraphs
 - Applying formatting within the same paragraph
