@@ -31,28 +31,43 @@ function handleFocusNode(e) {
 
   if (e.type === "mousedown") {
     const childNodes = editor.childNodes;
-    for (const child of childNodes) {
-      if (child.nodeName === "#text") {
-        const p = document.createElement("p");
-        p.textContent = child.textContent;
-        editor.replaceChild(p, child);
+    const child = childNodes[0];
+    console.log(child);
+    if (child && child.nodeName === "#text") {
+      const p = document.createElement("p");
+      p.textContent = child.textContent;
+      if (focusedNode === child) {
+        focusedNode = p;
       }
+      editor.replaceChild(p, child);
     }
   }
 }
 
 headerBtn.addEventListener("click", (e) => {
   if (focusedNode !== editor) {
-    console.log(editor.childNodes);
+    while (focusedNode.parentNode !== editor) {
+      focusedNode = focusedNode.parentNode;
+    }
+
     if (focusedNode.nodeName === "H2") {
       const p = document.createElement("p");
-      p.textContent = focusedNode.textContent;
+      const childArray = [...focusedNode.childNodes];
+
+      for (const child of childArray) {
+        p.appendChild(child);
+      }
+
       editor.replaceChild(p, focusedNode);
       focusedNode = p;
     } else {
-      console.log(focusedNode);
       const header = document.createElement("h2");
-      header.textContent = focusedNode.textContent;
+      const childArray = [...focusedNode.childNodes];
+
+      for (const child of childArray) {
+        header.appendChild(child);
+      }
+
       editor.replaceChild(header, focusedNode);
       focusedNode = header;
     }

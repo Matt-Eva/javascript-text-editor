@@ -10,26 +10,28 @@ Features include making headers, italicizing, bolding, and underlining text, cen
 
 - Things we need to account for
 
-  - Applying formatting across multiple paragraphs
-  - Applying formatting within the same paragraph
-  - Applying multiple formats at once
-  - Applying multiple formats across formatting boundaries
-  - Deselecting formatting across multiple paragraphs
-  - Deselecting formatting within the same paragraph
-  - Deselecting formatting within other formatting
-  - Deselecting formatting across formatting boundaries
+[]
 
-  ## Applying multiple formats across formatting boundaries
+- Applying formatting across multiple paragraphs
+- Applying formatting within the same paragraph
+- Applying multiple formats at once
+- Applying multiple formats across formatting boundaries
+- Deselecting formatting across multiple paragraphs
+- Deselecting formatting within the same paragraph
+- Deselecting formatting within other formatting
+- Deselecting formatting across formatting boundaries
 
-  Either the focusNode or the anchorNode will be a text node within another
-  styling node.
+## Applying multiple formats across formatting boundaries
 
-  We will want to find the most immediate parent node that is not a text node.
+Either the focusNode or the anchorNode will be a text node within another
+styling node.
 
-  This will be the node in which the starting / ending offset is calculated.
+We will want to find the most immediate parent node that is not a text node.
 
-  We need to check if there are intermediary nodes between these nodes. (i.e. a `<u>` with some content that is then `<strong>`, but not for full portion of `<u>`.)
+This will be the node in which the starting / ending offset is calculated.
 
-  We will need to check to see if the anchor or focus node has a nextSibling or previousSibling.
+We need to check if there are intermediary nodes between these nodes. (i.e. a `<u>` with some content that is then `<strong>`, but not for full portion of `<u>`.)
 
-  We also need to account for whether or not the current portion of the focus or anchor node already has the existing styling being applied.
+We will need to check to see if the anchor or focus node has a nextSibling or previousSibling.
+
+We also need to account for whether or not the current portion of the focus or anchor node already has the existing styling being applied.
