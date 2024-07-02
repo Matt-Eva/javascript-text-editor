@@ -215,8 +215,13 @@ function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
       childNodes[i] === anchorNode.parentNode
     ) {
       console.log("match");
-      const insertArray = [beforeNode, replaceNode, afterNode];
-      console.log(insertArray);
+      const potentialReplaceArray = [beforeNode, replaceNode, afterNode];
+      const insertArray = [];
+      for (const node of potentialReplaceArray) {
+        if (node.textContent !== "") {
+          insertArray.push(node);
+        }
+      }
       const beforeSlice = childNodes.slice(0, i);
       const afterSlice = childNodes.slice(i + 1);
       const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
