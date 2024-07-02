@@ -41,3 +41,5 @@ Only a select few html elements are allowed at final data output. These are
 - BLOCKQUOTE
 
 Before data is returned as json, it is cleaned to ensure that it only contains these specific elements.
+
+However, during editing, editor innerHTML may not align with these elements. Here are some elements that may be present
