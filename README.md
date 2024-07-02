@@ -1,5 +1,7 @@
 # JavaScript Text Editor
 
+<strong>Note:</strong><em>This is a work in progress. Not all features listed below are available at the present time</em>
+
 This is a custom built text editor made with JavaScript that outputs JSON.
 
 It uses a `contenteditable` HTML element as the wrapper.
