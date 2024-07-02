@@ -104,22 +104,21 @@ italicizeBtn.addEventListener("click", () => {
   if (currentSelection && !currentSelection.isCollapsed) {
     let anchorNode = currentSelection.anchorNode;
     let focusNode = currentSelection.focusNode;
+    const anchorOffset = currentSelection.anchorOffset;
+    const focusOffset = currentSelection.focusOffset;
+    console.log(anchorOffset);
+    console.log(focusOffset);
     const sameParent = checkSameParentNode(anchorNode, focusNode);
-    console.log("same parent", sameParent);
 
     if (sameParent) {
-      formatSameParent(anchorNode, focusNode);
+      formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset);
     } else {
       formatSeparateParent();
     }
   }
 });
 
-function formatSameParent(anchorNode, focusNode) {
-  anchorNode.textContent = "hello!!";
-  console.log("anchor node", anchorNode);
-  console.log("focus node", focusNode);
-
+function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
   while (
     !anchorNode.nextSibling &&
     anchorNode.parentNode.parentNode !== editor
@@ -129,31 +128,68 @@ function formatSameParent(anchorNode, focusNode) {
   while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
     focusNode = focusNode.parentNode;
   }
-  console.log("anchorNode next sibling", anchorNode.nextSibling);
-  console.log("focusNode next sibling", focusNode.nextSibling);
-  console.log("anchor node", anchorNode);
-  console.log("focus node", focusNode);
-  console.log("focusNode textcontent", focusNode.textContent);
-  console.log("focusNode innertext", focusNode.innerText);
-  console.log("anchorNode textcontent", anchorNode.textContent);
-  console.log("anchorNode innertext", anchorNode.innerText);
+
+  if (anchorNode === focusNode) {
+    let before = "";
+    let selected = "";
+    let after = "";
+    if (anchorOffset < focusOffset) {
+      before = anchorNode.textContent.slice(0, anchorOffset);
+      selected = anchorNode.textContent.slice(anchorOffset, focusOffset);
+      after = anchorNode.textContent.slice(focusOffset);
+    } else {
+      before = anchorNode.textContent.slice(0, focusOffset);
+      selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
+      after = anchorNode.textContent.slice(anchorOffset);
+    }
+    const em = document.createElement("em");
+    em.textContent = selected;
+    const beforeNode = document.createTextNode(before);
+    const afterNode = document.createTextNode(after);
+    console.log(anchorNode === focusNode);
+    const parentNode = anchorNode.parentNode;
+    const childNodes = Array.from(parentNode.childNodes);
+    console.log(childNodes);
+
+    for (let i = 0; i < childNodes.length; i++) {
+      console.log(childNodes[i]);
+      if (childNodes[i] === anchorNode) {
+        const insertArray = [beforeNode, em, afterNode];
+        const beforeSlice = childNodes.slice(0, i);
+        const afterSlice = childNodes.slice(i + 1);
+        const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
+        parentNode.textContent = "";
+        for (const child of newChildNodes) {
+          parentNode.appendChild(child);
+        }
+        break;
+      }
+    }
+  }
 
   const position = anchorNode.compareDocumentPosition(focusNode);
   const nodeArray = [];
 
-  if (anchorNode === focusNode) {
-    nodeArray.push(focusNode);
-  } else if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+  if (position & Node.DOCUMENT_POSITION_PRECEDING) {
     let node = focusNode;
     while (node !== anchorNode) {
       nodeArray.push(node);
       node = node.nextSibling;
     }
+    nodeArray.push(anchorNode);
   } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
     let node = anchorNode;
     while (node !== focusNode) {
       nodeArray.push(node);
       node = node.nextSibling;
+    }
+    nodeArray.push(focusNode);
+  }
+
+  for (const node of nodeArray) {
+    if (node === focusNode) {
+    } else if (node === anchorNode) {
+    } else {
     }
   }
 }
