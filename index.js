@@ -38,31 +38,27 @@ toolbar.addEventListener("mouseenter", () => {
       p.append(node);
     }
 
-    focusedNode = p;
+    if (focusedNode === child) {
+      focusedNode = p;
+    }
+
     editor.insertBefore(p, editor.firstChild);
   }
 });
 
-editor.addEventListener("keyup", handleFocusNode);
-editor.addEventListener("mousedown", handleFocusNode);
-
-function handleFocusNode(e) {
-  console.log(e.eventType);
+editor.addEventListener("keyup", () => {
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
+  focusedNode = anchorNode;
+  console.log(focusedNode);
+});
 
-  if (anchorNode !== editor) {
-    focusedNode = anchorNode;
+editor.addEventListener("mousedown", (e) => {
+  if (e.target !== editor) {
+    focusedNode = e.target;
   }
-
-  if (editor.childNodes.length === 0) {
-    setTimeout(() => {
-      if (editor.childNodes.length !== 0) {
-        focusedNode = editor.childNodes[0];
-      }
-    }, 1);
-  }
-}
+  console.log(focusedNode);
+});
 
 headerBtn.addEventListener("click", (e) => {
   if (focusedNode !== editor) {
