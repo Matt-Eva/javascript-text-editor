@@ -17,7 +17,23 @@ editor.addEventListener("mouseup", () => {
   }
 });
 
-toolbar.addEventListener("mouseenter", () => {
+editor.addEventListener("keyup", () => {
+  const selection = window.getSelection();
+  const anchorNode = selection.anchorNode;
+  focusedNode = anchorNode;
+  console.log(focusedNode);
+});
+
+toolbar.addEventListener("mouseenter", replaceFirstTextChild);
+
+editor.addEventListener("mousedown", (e) => {
+  if (e.target !== editor) {
+    focusedNode = e.target;
+  }
+  replaceFirstTextChild();
+});
+
+function replaceFirstTextChild() {
   const childNodes = editor.childNodes;
   const child = childNodes[0];
 
@@ -44,21 +60,7 @@ toolbar.addEventListener("mouseenter", () => {
 
     editor.insertBefore(p, editor.firstChild);
   }
-});
-
-editor.addEventListener("keyup", () => {
-  const selection = window.getSelection();
-  const anchorNode = selection.anchorNode;
-  focusedNode = anchorNode;
-  console.log(focusedNode);
-});
-
-editor.addEventListener("mousedown", (e) => {
-  if (e.target !== editor) {
-    focusedNode = e.target;
-  }
-  console.log(focusedNode);
-});
+}
 
 headerBtn.addEventListener("click", (e) => {
   if (focusedNode !== editor) {
@@ -99,6 +101,7 @@ italicizeBtn.addEventListener("click", () => {
     console.log(anchorOffset);
     console.log(focusOffset);
     const sameParent = checkSameParentNode(anchorNode, focusNode);
+    console.log(sameParent);
 
     if (sameParent) {
       formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset);
@@ -124,54 +127,8 @@ function checkSameParentNode(anchorNode, focusNode) {
 
 function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
   if (anchorNode === focusNode) {
-    let before = "";
-    let selected = "";
-    let after = "";
-    if (anchorOffset < focusOffset) {
-      before = anchorNode.textContent.slice(0, anchorOffset);
-      selected = anchorNode.textContent.slice(anchorOffset, focusOffset);
-      after = anchorNode.textContent.slice(focusOffset);
-    } else {
-      before = anchorNode.textContent.slice(0, focusOffset);
-      selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
-      after = anchorNode.textContent.slice(anchorOffset);
-    }
-    if (
-      anchorNode.parentNode.nodeName === "EM" ||
-      anchorNode.parentNode.nodeName === "I"
-    ) {
-      console.log("already italicized");
-      const em = anchorNode.parentNode;
-      const emParent = em.parentNode;
-      const textNode = document.createTextNode(selected);
-
-      return;
-    } else {
-      const em = document.createElement("em");
-      em.textContent = selected;
-      const beforeNode = document.createTextNode(before);
-      const afterNode = document.createTextNode(after);
-      console.log(anchorNode === focusNode);
-      const parentNode = anchorNode.parentNode;
-      const childNodes = Array.from(parentNode.childNodes);
-      console.log(childNodes);
-
-      for (let i = 0; i < childNodes.length; i++) {
-        console.log(childNodes[i]);
-        if (childNodes[i] === anchorNode) {
-          const insertArray = [beforeNode, em, afterNode];
-          const beforeSlice = childNodes.slice(0, i);
-          const afterSlice = childNodes.slice(i + 1);
-          const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
-          parentNode.textContent = "";
-          for (const child of newChildNodes) {
-            parentNode.appendChild(child);
-          }
-          break;
-        }
-      }
-      return;
-    }
+    formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset);
+    return;
   }
 
   while (
@@ -207,6 +164,67 @@ function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
     if (node === focusNode) {
     } else if (node === anchorNode) {
     } else {
+    }
+  }
+}
+
+function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
+  let before = "";
+  let selected = "";
+  let after = "";
+  if (anchorOffset < focusOffset) {
+    before = anchorNode.textContent.slice(0, anchorOffset);
+    selected = anchorNode.textContent.slice(anchorOffset, focusOffset);
+    after = anchorNode.textContent.slice(focusOffset);
+  } else {
+    before = anchorNode.textContent.slice(0, focusOffset);
+    selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
+    after = anchorNode.textContent.slice(anchorOffset);
+  }
+  // console.log(before, after, selected);
+
+  let beforeNode;
+  let afterNode;
+  let replaceNode;
+  let childNodes;
+  let parentNode = anchorNode.parentNode;
+  if (parentNode.nodeName === "EM" || parentNode.nodeName === "I") {
+    parentNode = parentNode.parentNode;
+    beforeNode = document.createElement("em");
+    beforeNode.textContent = before;
+    afterNode = document.createElement("em");
+    afterNode.textContent = after;
+    replaceNode = document.createTextNode(selected);
+    childNodes = Array.from(parentNode.childNodes);
+  } else {
+    replaceNode = document.createElement("em");
+    replaceNode.textContent = selected;
+    beforeNode = document.createTextNode(before);
+    afterNode = document.createTextNode(after);
+    console.log(anchorNode === focusNode);
+    parentNode = anchorNode.parentNode;
+    childNodes = Array.from(parentNode.childNodes);
+  }
+  console.log(anchorNode);
+  console.log(parentNode);
+  console.log(childNodes);
+
+  for (let i = 0; i < childNodes.length; i++) {
+    if (
+      childNodes[i] === anchorNode ||
+      childNodes[i] === anchorNode.parentNode
+    ) {
+      console.log("match");
+      const insertArray = [beforeNode, replaceNode, afterNode];
+      console.log(insertArray);
+      const beforeSlice = childNodes.slice(0, i);
+      const afterSlice = childNodes.slice(i + 1);
+      const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
+      parentNode.textContent = "";
+      for (const child of newChildNodes) {
+        parentNode.appendChild(child);
+      }
+      break;
     }
   }
 }
