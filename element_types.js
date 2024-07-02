@@ -10,4 +10,5 @@ export const inlineTypes = {
   U: true,
   EM: true,
   STRONG: true,
+  "#text": true,
 };

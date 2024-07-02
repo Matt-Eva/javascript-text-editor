@@ -90,20 +90,6 @@ headerBtn.addEventListener("click", (e) => {
   }
 });
 
-function checkSameParentNode(anchorNode, focusNode) {
-  let anchorParent = anchorNode.parentNode;
-  let focusParent = focusNode.parentNode;
-  while (anchorParent.parentNode !== editor) {
-    anchorParent = anchorParent.parentNode;
-  }
-
-  while (focusParent.parentNode !== editor) {
-    focusParent = focusParent.parentNode;
-  }
-
-  return focusParent === anchorParent;
-}
-
 italicizeBtn.addEventListener("click", () => {
   if (currentSelection && !currentSelection.isCollapsed) {
     let anchorNode = currentSelection.anchorNode;
@@ -122,6 +108,20 @@ italicizeBtn.addEventListener("click", () => {
   }
 });
 
+function checkSameParentNode(anchorNode, focusNode) {
+  let anchorParent = anchorNode.parentNode;
+  let focusParent = focusNode.parentNode;
+  while (anchorParent.parentNode !== editor) {
+    anchorParent = anchorParent.parentNode;
+  }
+
+  while (focusParent.parentNode !== editor) {
+    focusParent = focusParent.parentNode;
+  }
+
+  return focusParent === anchorParent;
+}
+
 function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
   if (anchorNode === focusNode) {
     let before = "";
@@ -136,8 +136,14 @@ function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
       selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
       after = anchorNode.textContent.slice(anchorOffset);
     }
-    if (anchorNode.parentNode.nodeName === "EM") {
-      const textNode = document.createTextNode("selected");
+    if (
+      anchorNode.parentNode.nodeName === "EM" ||
+      anchorNode.parentNode.nodeName === "I"
+    ) {
+      console.log("already italicized");
+      const em = anchorNode.parentNode;
+      const emParent = em.parentNode;
+      const textNode = document.createTextNode(selected);
 
       return;
     } else {
