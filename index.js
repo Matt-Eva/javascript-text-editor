@@ -1,10 +1,13 @@
+import { blockTypes, inlineTypes } from "./element_types.js";
+
 const editor = document.getElementById("editor");
 const headerBtn = document.getElementById("headerBtn");
 const italicizeBtn = document.getElementById("italicize");
 const boldBtn = document.getElementById("bold");
 const underlineBtn = document.getElementById("underline");
+const toolbar = document.getElementById("toolbar");
 
-let focusedNode = editor;
+let focusedNode;
 let currentSelection;
 
 editor.addEventListener("mouseup", () => {
@@ -14,10 +17,37 @@ editor.addEventListener("mouseup", () => {
   }
 });
 
+toolbar.addEventListener("mouseenter", () => {
+  const childNodes = editor.childNodes;
+  const child = childNodes[0];
+
+  if (child && child.nodeName === "#text") {
+    const relevantNodes = [child];
+    let node = child.nextSibling;
+    while (node && inlineTypes[node.nodeName]) {
+      relevantNodes.push(node);
+      node = node.nextSibling;
+    }
+
+    const p = document.createElement("p");
+    const appendNodes = [...relevantNodes];
+    for (const node of relevantNodes) {
+      editor.removeChild(node);
+    }
+    for (const node of appendNodes) {
+      p.append(node);
+    }
+
+    focusedNode = p;
+    editor.insertBefore(p, editor.firstChild);
+  }
+});
+
 editor.addEventListener("keyup", handleFocusNode);
 editor.addEventListener("mousedown", handleFocusNode);
 
 function handleFocusNode(e) {
+  console.log(e.eventType);
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
 
@@ -38,14 +68,23 @@ function handleFocusNode(e) {
     const child = childNodes[0];
 
     if (child && child.nodeName === "#text") {
-      const p = document.createElement("p");
-      p.textContent = child.textContent;
-
-      if (focusedNode === child) {
-        focusedNode = p;
+      const relevantNodes = [child];
+      let node = child.nextSibling;
+      while (node && inlineTypes[node.nodeName]) {
+        relevantNodes.push(node);
+        node = node.nextSibling;
       }
 
-      editor.replaceChild(p, child);
+      const p = document.createElement("p");
+      const appendNodes = [...relevantNodes];
+      for (const node of relevantNodes) {
+        editor.removeChild(node);
+      }
+      for (const node of appendNodes) {
+        p.append(node);
+      }
+
+      editor.insertBefore(p, editor.firstChild);
     }
   }
 }
@@ -66,12 +105,6 @@ headerBtn.addEventListener("click", (e) => {
 
       editor.replaceChild(p, focusedNode);
       focusedNode = p;
-    } else if (focusedNode.nodeName === "#text") {
-      const header = document.createElement("h2");
-      header.textContent = focusedNode.textContent;
-
-      editor.replaceChild(header, focusedNode);
-      focusedNode = header;
     } else {
       const header = document.createElement("h2");
       const childArray = [...focusedNode.childNodes];
@@ -87,8 +120,8 @@ headerBtn.addEventListener("click", (e) => {
 });
 
 function checkSameParentNode(anchorNode, focusNode) {
-  anchorParent = anchorNode.parentNode;
-  focusParent = focusNode.parentNode;
+  let anchorParent = anchorNode.parentNode;
+  let focusParent = focusNode.parentNode;
   while (anchorParent.parentNode !== editor) {
     anchorParent = anchorParent.parentNode;
   }
@@ -119,16 +152,6 @@ italicizeBtn.addEventListener("click", () => {
 });
 
 function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
-  while (
-    !anchorNode.nextSibling &&
-    anchorNode.parentNode.parentNode !== editor
-  ) {
-    anchorNode = anchorNode.parentNode;
-  }
-  while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
-    focusNode = focusNode.parentNode;
-  }
-
   if (anchorNode === focusNode) {
     let before = "";
     let selected = "";
@@ -142,29 +165,46 @@ function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
       selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
       after = anchorNode.textContent.slice(anchorOffset);
     }
-    const em = document.createElement("em");
-    em.textContent = selected;
-    const beforeNode = document.createTextNode(before);
-    const afterNode = document.createTextNode(after);
-    console.log(anchorNode === focusNode);
-    const parentNode = anchorNode.parentNode;
-    const childNodes = Array.from(parentNode.childNodes);
-    console.log(childNodes);
+    if (anchorNode.parentNode.nodeName === "EM") {
+      const textNode = document.createTextNode("selected");
 
-    for (let i = 0; i < childNodes.length; i++) {
-      console.log(childNodes[i]);
-      if (childNodes[i] === anchorNode) {
-        const insertArray = [beforeNode, em, afterNode];
-        const beforeSlice = childNodes.slice(0, i);
-        const afterSlice = childNodes.slice(i + 1);
-        const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
-        parentNode.textContent = "";
-        for (const child of newChildNodes) {
-          parentNode.appendChild(child);
+      return;
+    } else {
+      const em = document.createElement("em");
+      em.textContent = selected;
+      const beforeNode = document.createTextNode(before);
+      const afterNode = document.createTextNode(after);
+      console.log(anchorNode === focusNode);
+      const parentNode = anchorNode.parentNode;
+      const childNodes = Array.from(parentNode.childNodes);
+      console.log(childNodes);
+
+      for (let i = 0; i < childNodes.length; i++) {
+        console.log(childNodes[i]);
+        if (childNodes[i] === anchorNode) {
+          const insertArray = [beforeNode, em, afterNode];
+          const beforeSlice = childNodes.slice(0, i);
+          const afterSlice = childNodes.slice(i + 1);
+          const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
+          parentNode.textContent = "";
+          for (const child of newChildNodes) {
+            parentNode.appendChild(child);
+          }
+          break;
         }
-        break;
       }
+      return;
     }
+  }
+
+  while (
+    !anchorNode.nextSibling &&
+    anchorNode.parentNode.parentNode !== editor
+  ) {
+    anchorNode = anchorNode.parentNode;
+  }
+  while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
+    focusNode = focusNode.parentNode;
   }
 
   const position = anchorNode.compareDocumentPosition(focusNode);
