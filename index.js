@@ -7,6 +7,14 @@ const boldBtn = document.getElementById("bold");
 const underlineBtn = document.getElementById("underline");
 const toolbar = document.getElementById("toolbar");
 
+document.addEventListener("DOMContentLoaded", () => {
+  const p = document.createElement("P");
+  const em = document.createElement("EM");
+  em.textContent = "Hello world!";
+  p.append(em);
+  document.body.append(p);
+});
+
 let focusedNode;
 let currentSelection;
 
@@ -21,7 +29,6 @@ editor.addEventListener("keyup", () => {
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
   focusedNode = anchorNode;
-  console.log(focusedNode);
 });
 
 toolbar.addEventListener("mouseenter", replaceFirstTextChild);
@@ -98,18 +105,33 @@ italicizeBtn.addEventListener("click", () => {
     let focusNode = currentSelection.focusNode;
     const anchorOffset = currentSelection.anchorOffset;
     const focusOffset = currentSelection.focusOffset;
-    console.log(anchorOffset);
-    console.log(focusOffset);
     const sameParent = checkSameParentNode(anchorNode, focusNode);
-    console.log(sameParent);
 
     if (sameParent) {
       formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset);
     } else {
       formatSeparateParent();
     }
+    removeRedundantAdjacentNodes();
   }
 });
+
+function removeRedundantAdjacentNodes() {
+  const children = editor.childNodes;
+  for (const child of children) {
+    const nestedChildren = child.childNodes;
+    recursivelyRemoveRedundantNodes(nestedChildren);
+  }
+}
+
+function recursivelyRemoveRedundantNodes(nodes) {
+  for (const node of nodes) {
+    const children = node.childNodes;
+    if (children) {
+      recursivelyRemoveRedundantNodes(children);
+    }
+  }
+}
 
 function checkSameParentNode(anchorNode, focusNode) {
   let anchorParent = anchorNode.parentNode;
@@ -181,7 +203,6 @@ function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
     selected = anchorNode.textContent.slice(focusOffset, anchorOffset);
     after = anchorNode.textContent.slice(anchorOffset);
   }
-  // console.log(before, after, selected);
 
   let beforeNode;
   let afterNode;
@@ -201,20 +222,15 @@ function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
     replaceNode.textContent = selected;
     beforeNode = document.createTextNode(before);
     afterNode = document.createTextNode(after);
-    console.log(anchorNode === focusNode);
     parentNode = anchorNode.parentNode;
     childNodes = Array.from(parentNode.childNodes);
   }
-  console.log(anchorNode);
-  console.log(parentNode);
-  console.log(childNodes);
 
   for (let i = 0; i < childNodes.length; i++) {
     if (
       childNodes[i] === anchorNode ||
       childNodes[i] === anchorNode.parentNode
     ) {
-      console.log("match");
       const potentialReplaceArray = [beforeNode, replaceNode, afterNode];
       const insertArray = [];
       for (const node of potentialReplaceArray) {
