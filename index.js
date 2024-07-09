@@ -1,4 +1,11 @@
 import { blockTypes, inlineTypes } from "./element_types.js";
+import {
+  keyupFocus,
+  mousedownFocus,
+  setCurrentSelection,
+} from "./handle_selection_and_focus.js";
+import { makeHeader } from "./make_header.js";
+import { replaceFirstTextChild } from "./replace_first_text_child.js";
 
 const editor = document.getElementById("editor");
 const headerBtn = document.getElementById("headerBtn");
@@ -15,96 +22,32 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.append(p);
 });
 
-let focusedNode;
-let currentSelection;
+const state = {
+  focusedNode: undefined,
+  currentSelection: undefined,
+};
 
-editor.addEventListener("mouseup", () => {
-  const selection = window.getSelection();
-  if (!selection.isCollapsed) {
-    currentSelection = selection;
-  }
-});
+editor.addEventListener("mouseup", () => setCurrentSelection(state));
 
-editor.addEventListener("keyup", () => {
-  const selection = window.getSelection();
-  const anchorNode = selection.anchorNode;
-  focusedNode = anchorNode;
-});
+editor.addEventListener("keyup", () => keyupFocus(state));
 
-toolbar.addEventListener("mouseenter", replaceFirstTextChild);
+toolbar.addEventListener("mouseenter", () =>
+  replaceFirstTextChild(editor, state)
+);
 
 editor.addEventListener("mousedown", (e) => {
-  if (e.target !== editor) {
-    focusedNode = e.target;
-  }
-  replaceFirstTextChild();
+  mousedownFocus(e, editor, state);
+  replaceFirstTextChild(editor, state);
 });
 
-function replaceFirstTextChild() {
-  const childNodes = editor.childNodes;
-  const child = childNodes[0];
-
-  if (child && child.nodeName === "#text") {
-    const relevantNodes = [child];
-    let node = child.nextSibling;
-    while (node && inlineTypes[node.nodeName]) {
-      relevantNodes.push(node);
-      node = node.nextSibling;
-    }
-
-    const p = document.createElement("p");
-    const appendNodes = [...relevantNodes];
-    for (const node of relevantNodes) {
-      editor.removeChild(node);
-    }
-    for (const node of appendNodes) {
-      p.append(node);
-    }
-
-    if (focusedNode === child) {
-      focusedNode = p;
-    }
-
-    editor.insertBefore(p, editor.firstChild);
-  }
-}
-
-headerBtn.addEventListener("click", (e) => {
-  if (focusedNode !== editor) {
-    while (focusedNode.parentNode !== editor) {
-      focusedNode = focusedNode.parentNode;
-    }
-
-    if (focusedNode.nodeName === "H2") {
-      const p = document.createElement("p");
-      const childArray = [...focusedNode.childNodes];
-
-      for (const child of childArray) {
-        p.appendChild(child);
-      }
-
-      editor.replaceChild(p, focusedNode);
-      focusedNode = p;
-    } else {
-      const header = document.createElement("h2");
-      const childArray = [...focusedNode.childNodes];
-
-      for (const child of childArray) {
-        header.appendChild(child);
-      }
-
-      editor.replaceChild(header, focusedNode);
-      focusedNode = header;
-    }
-  }
-});
+headerBtn.addEventListener("click", () => makeHeader(editor, state));
 
 italicizeBtn.addEventListener("click", async () => {
-  if (currentSelection && !currentSelection.isCollapsed) {
-    let anchorNode = currentSelection.anchorNode;
-    let focusNode = currentSelection.focusNode;
-    const anchorOffset = currentSelection.anchorOffset;
-    const focusOffset = currentSelection.focusOffset;
+  if (state.currentSelection && !state.currentSelection.isCollapsed) {
+    let anchorNode = state.currentSelection.anchorNode;
+    let focusNode = state.currentSelection.focusNode;
+    const anchorOffset = state.currentSelection.anchorOffset;
+    const focusOffset = state.currentSelection.focusOffset;
     const sameParent = checkSameParentNode(anchorNode, focusNode);
 
     if (sameParent) {
