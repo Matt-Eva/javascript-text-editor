@@ -46,9 +46,9 @@ function init() {
 
   headerBtn.addEventListener("click", () => makeHeader(editor, state));
 
-  italicizeBtn.addEventListener("click", () => handleFormatting(editor, "em"));
-
-  //
+  italicizeBtn.addEventListener("click", () =>
+    handleFormatting(state, editor, "em")
+  );
 
   // italicizeBtn.addEventListener("click", () => {
   //   if (currentSelection && !currentSelection.isCollapsed) {

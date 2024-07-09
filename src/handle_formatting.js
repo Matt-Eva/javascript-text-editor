@@ -1,4 +1,6 @@
-export function handleFormatting(editor, style) {
+import { removeRedundantAdjacentNodes } from "./handle_redundant_nodes.js";
+
+export function handleFormatting(state, editor, style) {
   if (state.currentSelection && !state.currentSelection.isCollapsed) {
     let anchorNode = state.currentSelection.anchorNode;
     let focusNode = state.currentSelection.focusNode;
@@ -11,6 +13,7 @@ export function handleFormatting(editor, style) {
     } else {
       formatSeparateParent();
     }
+    removeRedundantAdjacentNodes(editor);
   }
 }
 
@@ -29,46 +32,47 @@ function checkSameParentNode(anchorNode, focusNode, editor) {
 }
 
 function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
+  console.log(anchorNode, focusNode);
   if (anchorNode === focusNode) {
     formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset);
     return;
   }
 
-  while (
-    !anchorNode.nextSibling &&
-    anchorNode.parentNode.parentNode !== editor
-  ) {
-    anchorNode = anchorNode.parentNode;
-  }
-  while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
-    focusNode = focusNode.parentNode;
-  }
+  // while (
+  //   !anchorNode.nextSibling &&
+  //   anchorNode.parentNode.parentNode !== editor
+  // ) {
+  //   anchorNode = anchorNode.parentNode;
+  // }
+  // while (!focusNode.nextSibling && focusNode.parentNode.parentNode !== editor) {
+  //   focusNode = focusNode.parentNode;
+  // }
 
-  const position = anchorNode.compareDocumentPosition(focusNode);
-  const nodeArray = [];
+  // const position = anchorNode.compareDocumentPosition(focusNode);
+  // const nodeArray = [];
 
-  if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-    let node = focusNode;
-    while (node !== anchorNode) {
-      nodeArray.push(node);
-      node = node.nextSibling;
-    }
-    nodeArray.push(anchorNode);
-  } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-    let node = anchorNode;
-    while (node !== focusNode) {
-      nodeArray.push(node);
-      node = node.nextSibling;
-    }
-    nodeArray.push(focusNode);
-  }
+  // if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+  //   let node = focusNode;
+  //   while (node !== anchorNode) {
+  //     nodeArray.push(node);
+  //     node = node.nextSibling;
+  //   }
+  //   nodeArray.push(anchorNode);
+  // } else if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+  //   let node = anchorNode;
+  //   while (node !== focusNode) {
+  //     nodeArray.push(node);
+  //     node = node.nextSibling;
+  //   }
+  //   nodeArray.push(focusNode);
+  // }
 
-  for (const node of nodeArray) {
-    if (node === focusNode) {
-    } else if (node === anchorNode) {
-    } else {
-    }
-  }
+  // for (const node of nodeArray) {
+  //   if (node === focusNode) {
+  //   } else if (node === anchorNode) {
+  //   } else {
+  //   }
+  // }
 }
 
 function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
@@ -130,3 +134,5 @@ function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
     }
   }
 }
+
+function formatSeparateParent() {}

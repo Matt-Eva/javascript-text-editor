@@ -1,18 +1,51 @@
-export function removeRedundantAdjacentNodes() {
+export function removeRedundantAdjacentNodes(editor) {
   const children = editor.childNodes;
   for (const child of children) {
     console.log(child);
     const nestedChildren = child.childNodes;
-    console.log(nestedChildren);
     if (nestedChildren) {
       const newChildren = recursivelyRemoveRedundantNodes(nestedChildren);
-      console.log(newChildren);
-      child.textContent = "";
-      for (const newChild of newChildren) {
-        child.appendChild(newChild);
-      }
+      // console.log(newChildren);
+      // child.textContent = "";
+      // for (const newChild of newChildren) {
+      //   child.appendChild(newChild);
+      // }
     }
   }
+}
+
+function recursivelyRemoveRedundantNodes(nodes) {
+  const finalNodes = [];
+  console.log("nodes", nodes);
+  for (const node of nodes) {
+    const childNodes = node.childNodes;
+    const newChildren = recursivelyRemoveRedundantNodes(childNodes);
+    console.log("new children", newChildren);
+    for (const child of childNodes) {
+      node.removeChild(child);
+    }
+    for (const child of newChildren) {
+      node.appendChild(child);
+    }
+    console.log("appended children", node.childNodes);
+    if (finalNodes.length !== 0) {
+      const tail = finalNodes[finalNodes.length - 1];
+      if (tail.nodeName === node.nodeName) {
+        if (node.nodeName === "#text") {
+          const textContent = tail.textContent + node.textContent;
+          const newNode = document.createTextNode(textContent);
+          finalNodes.pop();
+          finalNodes.push(newNode);
+        }
+      } else {
+        finalNodes.push(node);
+      }
+    } else {
+      finalNodes.push(node);
+    }
+  }
+  console.log("final nodes", finalNodes);
+  return [...finalNodes];
 }
 
 // function recursivelyRemoveRedundantNodes(nodes) {
