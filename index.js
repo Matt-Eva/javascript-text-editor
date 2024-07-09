@@ -1,11 +1,11 @@
-import { blockTypes, inlineTypes } from "./element_types.js";
+import { blockTypes, inlineTypes } from "./src/element_types.js";
 import {
   keyupFocus,
   mousedownFocus,
   setCurrentSelection,
-} from "./handle_selection_and_focus.js";
-import { makeHeader } from "./make_header.js";
-import { replaceFirstTextChild } from "./replace_first_text_child.js";
+} from "./src/handle_selection_and_focus.js";
+import { makeHeader } from "./src/make_header.js";
+import { replaceFirstTextChild } from "./src/replace_first_text_child.js";
 
 const editor = document.getElementById("editor");
 const headerBtn = document.getElementById("headerBtn");
