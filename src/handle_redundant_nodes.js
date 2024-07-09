@@ -1,41 +1,74 @@
-export function removeRedundantAdjacentNodes(editor) {
+export async function removeRedundantAdjacentNodes(editor) {
   const children = editor.childNodes;
   for (const child of children) {
     console.log(child);
     const nestedChildren = child.childNodes;
-    if (nestedChildren) {
-      const newChildren = recursivelyRemoveRedundantNodes(nestedChildren);
-      // console.log(newChildren);
-      // child.textContent = "";
-      // for (const newChild of newChildren) {
-      //   child.appendChild(newChild);
-      // }
+    const newChildren = await recursivelyRemoveRedundantNodes(nestedChildren);
+
+    console.log("nestedChildren", nestedChildren);
+    console.log("new children", newChildren);
+    while (child.hasChildNodes()) {
+      child.removeChild(child.firstChild);
+    }
+    console.log("child nodes", child.childNodes);
+    for (const newChild of newChildren) {
+      await child.appendChild(newChild);
     }
   }
 }
 
-function recursivelyRemoveRedundantNodes(nodes) {
+async function recursivelyRemoveRedundantNodes(paramNodes) {
+  const nodes = [...paramNodes];
+  const matchingNodes = {
+    I: "EM",
+    EM: "I",
+    B: "STRONG",
+    STRONG: "B",
+  };
+  const correctNodes = {
+    I: "EM",
+    EM: "EM",
+    B: "STRONG",
+    STRONG: "STRONG",
+  };
   const finalNodes = [];
   console.log("nodes", nodes);
   for (const node of nodes) {
     const childNodes = node.childNodes;
-    const newChildren = recursivelyRemoveRedundantNodes(childNodes);
+    const newChildren = await recursivelyRemoveRedundantNodes(childNodes);
     console.log("new children", newChildren);
     for (const child of childNodes) {
-      node.removeChild(child);
+      await node.removeChild(child);
     }
     for (const child of newChildren) {
-      node.appendChild(child);
+      await node.appendChild(child);
     }
     console.log("appended children", node.childNodes);
     if (finalNodes.length !== 0) {
       const tail = finalNodes[finalNodes.length - 1];
-      if (tail.nodeName === node.nodeName) {
+      if (
+        tail.nodeName === node.nodeName ||
+        matchingNodes[tail.nodeName] === node.nodeName
+      ) {
         if (node.nodeName === "#text") {
           const textContent = tail.textContent + node.textContent;
           const newNode = document.createTextNode(textContent);
           finalNodes.pop();
           finalNodes.push(newNode);
+        } else {
+          const correctNodeName = correctNodes[node.nodeName];
+          const newElement = document.createElement(correctNodeName);
+          const newChildren = [...tail.childNodes, ...node.childNodes];
+          const cleanedNewChildren = await recursivelyRemoveRedundantNodes(
+            newChildren
+          );
+
+          for (const child of cleanedNewChildren) {
+            await newElement.appendChild(child);
+          }
+
+          finalNodes.pop();
+          finalNodes.push(newElement);
         }
       } else {
         finalNodes.push(node);
