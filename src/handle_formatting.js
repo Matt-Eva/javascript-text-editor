@@ -8,10 +8,17 @@ export async function handleFormatting(state, editor, style) {
     let focusNode = state.currentSelection.focusNode;
     const anchorOffset = state.currentSelection.anchorOffset;
     const focusOffset = state.currentSelection.focusOffset;
-    const sameParent = checkSameParentNode(anchorNode, focusNode, editor);
+    const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
 
-    if (sameParent) {
-      formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset, style);
+    if (parentMap.sameParent) {
+      formatSameParent(
+        parentMap,
+        anchorNode,
+        focusNode,
+        anchorOffset,
+        focusOffset,
+        style
+      );
     } else {
       formatSeparateParent();
     }
@@ -22,6 +29,11 @@ export async function handleFormatting(state, editor, style) {
 function checkSameParentNode(anchorNode, focusNode, editor) {
   let anchorParent = anchorNode;
   let focusParent = focusNode;
+  const parentMap = {
+    sameParent: false,
+    anchorParentFocus: false,
+    focusParentAnchor: false,
+  };
 
   while (anchorParent !== editor && anchorParent.parentNode !== editor) {
     anchorParent = anchorParent.parentNode;
@@ -31,22 +43,33 @@ function checkSameParentNode(anchorNode, focusNode, editor) {
     focusParent = focusParent.parentNode;
   }
 
-  return focusParent === anchorParent;
+  parentMap.sameParent = focusParent === anchorParent;
+  parentMap.anchorParentFocus = anchorNode === focusParent;
+  parentMap.focusParentAnchor = focusNode === anchorParent;
+
+  return parentMap;
 }
 
 function formatSameParent(
+  parentMap,
   anchorNode,
   focusNode,
   anchorOffset,
   focusOffset,
   style
 ) {
-  if (anchorNode === focusNode) {
-    formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset, style);
-    return;
-  }
+  console.log(parentMap);
   console.log("anchor node", anchorNode);
   console.log("focus node", focusNode);
+  console.log("anchor offset", anchorOffset);
+  console.log("focus offset", focusOffset);
+  if (anchorNode === focusNode) {
+    formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset, style);
+  } else if (parentMap.anchorParentFocus) {
+    console.log("anchor node is parent node");
+  } else if (parentMap.focusParentAnchor) {
+    console.log("focus node is parent node");
+  }
 
   // while (
   //   !anchorNode.nextSibling &&
