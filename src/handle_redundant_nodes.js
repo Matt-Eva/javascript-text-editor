@@ -1,7 +1,6 @@
 export async function removeRedundantAdjacentNodes(editor) {
   const children = editor.childNodes;
   for (const child of children) {
-    console.log(child);
     const nestedChildren = child.childNodes;
     const newChildren = await recursivelyRemoveRedundantNodes(nestedChildren);
 
@@ -30,19 +29,23 @@ async function recursivelyRemoveRedundantNodes(paramNodes) {
     STRONG: "STRONG",
     U: "U",
   };
-
   const finalNodes = [];
+
   for (const node of nodes) {
     const childNodes = node.childNodes;
     const newChildren = await recursivelyRemoveRedundantNodes(childNodes);
+
     while (node.hasChildNodes()) {
       await node.removeChild(node.firstChild);
     }
+
     for (const child of newChildren) {
       await node.appendChild(child);
     }
+
     if (finalNodes.length !== 0) {
       const tail = finalNodes[finalNodes.length - 1];
+
       if (
         tail.nodeName === node.nodeName ||
         matchingNodes[tail.nodeName] === node.nodeName
@@ -50,6 +53,7 @@ async function recursivelyRemoveRedundantNodes(paramNodes) {
         if (node.nodeName === "#text") {
           const textContent = tail.textContent + node.textContent;
           const newNode = document.createTextNode(textContent);
+
           finalNodes.pop();
           finalNodes.push(newNode);
         } else {
