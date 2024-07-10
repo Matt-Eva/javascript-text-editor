@@ -15,7 +15,8 @@ Features include making headers, italicizing, bolding, and underlining text, cen
 [x]Preserve Formatting Across Header Changes
 [x]Apply Italics within Same Origin Node
 [x]Remove Italics within Same Origin Node
-[]Merge immediately adjacent Italics Nodes
+[x]Merge immediately adjacent EM Nodes (using toolbar)
+[]Merge immediately adjacent Italics nodes
 []Apply Cross Formatting Within Same Paragraph
 
 - Applying formatting across multiple paragraphs
