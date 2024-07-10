@@ -20,13 +20,14 @@ export async function handleFormatting(state, editor, style) {
 }
 
 function checkSameParentNode(anchorNode, focusNode, editor) {
-  let anchorParent = anchorNode.parentNode;
-  let focusParent = focusNode.parentNode;
-  while (anchorParent.parentNode !== editor) {
+  let anchorParent = anchorNode;
+  let focusParent = focusNode;
+
+  while (anchorParent !== editor && anchorParent.parentNode !== editor) {
     anchorParent = anchorParent.parentNode;
   }
 
-  while (focusParent.parentNode !== editor) {
+  while (focusParent !== editor && focusParent.parentNode !== editor) {
     focusParent = focusParent.parentNode;
   }
 
@@ -40,11 +41,12 @@ function formatSameParent(
   focusOffset,
   style
 ) {
-  console.log(anchorNode, focusNode);
   if (anchorNode === focusNode) {
     formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset, style);
     return;
   }
+  console.log("anchor node", anchorNode);
+  console.log("focus node", focusNode);
 
   // while (
   //   !anchorNode.nextSibling &&
@@ -119,7 +121,6 @@ function formatSameNode(
     styleMap[parentNode.nodeName] &&
     styleMap[parentNode.nodeName] === style
   ) {
-    console.log(style);
     parentNode = parentNode.parentNode;
     beforeNode = document.createElement(style);
     beforeNode.textContent = before;
@@ -128,7 +129,6 @@ function formatSameNode(
     replaceNode = document.createTextNode(selected);
     childNodes = Array.from(parentNode.childNodes);
   } else {
-    console.log(style);
     replaceNode = document.createElement(style);
     replaceNode.textContent = selected;
     beforeNode = document.createTextNode(before);

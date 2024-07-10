@@ -1,6 +1,4 @@
 export function handleMetaKey(e, state, editor) {
-  console.log(e.key);
-  console.log(state.metaPressed);
   const formatMap = {
     i: true,
     b: true,

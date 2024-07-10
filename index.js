@@ -44,14 +44,14 @@ function init() {
 
   editor.addEventListener("keydown", (e) => {
     if (state.timeoutID) {
-      console.log("clearing timeout");
       clearTimeout(state.timeoutID);
     }
+
     state.timeoutID = setTimeout(() => {
-      console.log("saving");
       convertToAccessibleFormatting;
     }, 1000);
-    handleMetaKey(e, state, editor);
+
+    // handleMetaKey(e, state, editor);
   });
 
   toolbar.addEventListener("mouseenter", () =>
