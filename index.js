@@ -1,5 +1,6 @@
 import { blockTypes, inlineTypes } from "./src/element_types.js";
 import { handleFormatting } from "./src/handle_formatting.js";
+import { handleMetaKey } from "./src/handle_meta_key.js";
 import {
   keyupFocus,
   mousedownFocus,
@@ -29,11 +30,17 @@ function init() {
   const state = {
     focusedNode: undefined,
     currentSelection: undefined,
+    metaPressed: false,
   };
 
   editor.addEventListener("mouseup", () => setCurrentSelection(state));
 
-  editor.addEventListener("keyup", () => keyupFocus(state));
+  editor.addEventListener("keyup", () => {
+    state.metaPressed = false;
+    keyupFocus(state);
+  });
+
+  editor.addEventListener("keydown", (e) => handleMetaKey(e, state, editor));
 
   toolbar.addEventListener("mouseenter", () =>
     replaceFirstTextChild(editor, state)
