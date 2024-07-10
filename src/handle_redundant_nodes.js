@@ -28,6 +28,7 @@ async function recursivelyRemoveRedundantNodes(paramNodes) {
     EM: "EM",
     B: "STRONG",
     STRONG: "STRONG",
+    U: "U",
   };
 
   const finalNodes = [];

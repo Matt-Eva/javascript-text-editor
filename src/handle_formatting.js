@@ -10,7 +10,7 @@ export async function handleFormatting(state, editor, style) {
     const sameParent = checkSameParentNode(anchorNode, focusNode, editor);
 
     if (sameParent) {
-      formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset);
+      formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset, style);
     } else {
       formatSeparateParent();
     }
@@ -18,7 +18,7 @@ export async function handleFormatting(state, editor, style) {
   removeRedundantAdjacentNodes(editor);
 }
 
-async function convertToAccessibleFormatting(editor) {
+export async function convertToAccessibleFormatting(editor) {
   const childNodes = editor.childNodes;
   await recursivelyCheckFormatting(childNodes);
 }
@@ -66,10 +66,16 @@ function checkSameParentNode(anchorNode, focusNode, editor) {
   return focusParent === anchorParent;
 }
 
-function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
+function formatSameParent(
+  anchorNode,
+  focusNode,
+  anchorOffset,
+  focusOffset,
+  style
+) {
   console.log(anchorNode, focusNode);
   if (anchorNode === focusNode) {
-    formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset);
+    formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset, style);
     return;
   }
 
@@ -110,7 +116,20 @@ function formatSameParent(anchorNode, focusNode, anchorOffset, focusOffset) {
   // }
 }
 
-function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
+function formatSameNode(
+  anchorNode,
+  focusNode,
+  anchorOffset,
+  focusOffset,
+  style
+) {
+  const styleMap = {
+    B: "STRONG",
+    STRONG: "STRONG",
+    I: "EM",
+    EM: "EM",
+    U: "U",
+  };
   let before = "";
   let selected = "";
   let after = "";
@@ -129,16 +148,21 @@ function formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset) {
   let replaceNode;
   let childNodes;
   let parentNode = anchorNode.parentNode;
-  if (parentNode.nodeName === "EM" || parentNode.nodeName === "I") {
+  if (
+    styleMap[parentNode.nodeName] &&
+    styleMap[parentNode.nodeName] === style
+  ) {
+    console.log(style);
     parentNode = parentNode.parentNode;
-    beforeNode = document.createElement("em");
+    beforeNode = document.createElement(style);
     beforeNode.textContent = before;
-    afterNode = document.createElement("em");
+    afterNode = document.createElement(style);
     afterNode.textContent = after;
     replaceNode = document.createTextNode(selected);
     childNodes = Array.from(parentNode.childNodes);
   } else {
-    replaceNode = document.createElement("em");
+    console.log(style);
+    replaceNode = document.createElement(style);
     replaceNode.textContent = selected;
     beforeNode = document.createTextNode(before);
     afterNode = document.createTextNode(after);

@@ -1,5 +1,8 @@
 import { blockTypes, inlineTypes } from "./src/element_types.js";
-import { handleFormatting } from "./src/handle_formatting.js";
+import {
+  convertToAccessibleFormatting,
+  handleFormatting,
+} from "./src/handle_formatting.js";
 import { handleMetaKey } from "./src/handle_meta_key.js";
 import {
   keyupFocus,
@@ -48,6 +51,7 @@ function init() {
     }
     state.timeoutID = setTimeout(() => {
       console.log("saving");
+      convertToAccessibleFormatting(editor);
     }, 1000);
     handleMetaKey(e, state, editor);
   });
@@ -64,8 +68,16 @@ function init() {
   headerBtn.addEventListener("click", () => makeHeader(editor, state));
 
   italicizeBtn.addEventListener("click", () =>
-    handleFormatting(state, editor, "em")
+    handleFormatting(state, editor, "EM")
   );
+
+  boldBtn.addEventListener("click", () => {
+    handleFormatting(state, editor, "STRONG");
+  });
+
+  underlineBtn.addEventListener("click", () => {
+    handleFormatting(state, editor, "U");
+  });
 
   // italicizeBtn.addEventListener("click", () => {
   //   if (currentSelection && !currentSelection.isCollapsed) {
