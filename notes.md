@@ -42,3 +42,9 @@ We need to check if there are intermediary nodes between these nodes. (i.e. a `<
 We will need to check to see if the anchor or focus node has a nextSibling or previousSibling.
 
 We also need to account for whether or not the current portion of the focus or anchor node already has the existing styling being applied.
+
+## Accessibility
+
+According to <a href="https://www.tpgi.com/screen-readers-support-for-text-level-html-semantics/">this article</a>, screen readers do not actually identify a major difference betwen <i> and <b> tags and <em> and <strong> tags by default. So either could ostensibly be included in the HTML with no effect on screen readers.
+
+This is an example of a screen reader reading formatted text: https://www.youtube.com/watch?v=Ssy4-NLLAO8

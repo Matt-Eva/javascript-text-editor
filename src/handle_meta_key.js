@@ -1,14 +1,7 @@
-export function handleMetaKey(e, state, editor) {
-  const formatMap = {
-    i: true,
-    b: true,
-  };
-  if (e.metaKey && state.metaPressed && formatMap[e.key]) {
+export function handleMetaKey(e, state) {
+  if (e.metaKey && state.metaPressed) {
     e.preventDefault();
   } else if (e.metaKey) {
     state.metaPressed = true;
-  } else {
-    console.log(state);
-    console.log("meta key not activated");
   }
 }
