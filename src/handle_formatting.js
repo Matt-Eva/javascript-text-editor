@@ -8,6 +8,8 @@ export async function handleFormatting(state, editor, style) {
     let focusNode = state.currentSelection.focusNode;
     const anchorOffset = state.currentSelection.anchorOffset;
     const focusOffset = state.currentSelection.focusOffset;
+    console.log("anchorNode", anchorNode);
+    console.log("focusNode", focusNode);
     const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
 
     if (parentMap.sameParent) {
@@ -27,6 +29,8 @@ export async function handleFormatting(state, editor, style) {
 }
 
 function checkSameParentNode(anchorNode, focusNode, editor) {
+  console.log("anchornode before parent change", anchorNode);
+  console.log("focus node before parent change", focusNode);
   let anchorParent = anchorNode;
   let focusParent = focusNode;
   const parentMap = {
@@ -35,13 +39,13 @@ function checkSameParentNode(anchorNode, focusNode, editor) {
     focusParentAnchor: false,
   };
 
-  while (anchorParent !== editor && anchorParent.parentNode !== editor) {
-    anchorParent = anchorParent.parentNode;
-  }
+  // while (anchorParent !== editor && anchorParent.parentNode !== editor) {
+  //   anchorParent = anchorParent.parentNode;
+  // }
 
-  while (focusParent !== editor && focusParent.parentNode !== editor) {
-    focusParent = focusParent.parentNode;
-  }
+  // while (focusParent !== editor && focusParent.parentNode !== editor) {
+  //   focusParent = focusParent.parentNode;
+  // }
 
   parentMap.sameParent = focusParent === anchorParent;
   parentMap.anchorParentFocus = anchorNode === focusParent;
@@ -58,17 +62,25 @@ function formatSameParent(
   focusOffset,
   style
 ) {
-  console.log(parentMap);
+  console.log("parent map", parentMap);
   console.log("anchor node", anchorNode);
   console.log("focus node", focusNode);
   console.log("anchor offset", anchorOffset);
   console.log("focus offset", focusOffset);
   if (anchorNode === focusNode) {
+    console.log("anchor node and focus node match");
     formatSameNode(anchorNode, focusNode, anchorOffset, focusOffset, style);
   } else if (parentMap.anchorParentFocus) {
     console.log("anchor node is parent node");
   } else if (parentMap.focusParentAnchor) {
     console.log("focus node is parent node");
+    formatFocusParentAnchor(
+      anchorNode,
+      focusNode,
+      anchorOffset,
+      focusOffset,
+      style
+    );
   }
 
   // while (
@@ -122,9 +134,11 @@ function formatSameNode(
     EM: "EM",
     U: "U",
   };
+
   let before = "";
   let selected = "";
   let after = "";
+
   if (anchorOffset < focusOffset) {
     before = anchorNode.textContent.slice(0, anchorOffset);
     selected = anchorNode.textContent.slice(anchorOffset, focusOffset);
@@ -140,6 +154,7 @@ function formatSameNode(
   let replaceNode;
   let childNodes;
   let parentNode = anchorNode.parentNode;
+
   if (
     styleMap[parentNode.nodeName] &&
     styleMap[parentNode.nodeName] === style
@@ -156,7 +171,6 @@ function formatSameNode(
     replaceNode.textContent = selected;
     beforeNode = document.createTextNode(before);
     afterNode = document.createTextNode(after);
-    parentNode = anchorNode.parentNode;
     childNodes = Array.from(parentNode.childNodes);
   }
 
@@ -167,20 +181,53 @@ function formatSameNode(
     ) {
       const potentialReplaceArray = [beforeNode, replaceNode, afterNode];
       const insertArray = [];
+
       for (const node of potentialReplaceArray) {
         if (node.textContent !== "") {
           insertArray.push(node);
         }
       }
+
       const beforeSlice = childNodes.slice(0, i);
       const afterSlice = childNodes.slice(i + 1);
       const newChildNodes = [...beforeSlice, ...insertArray, ...afterSlice];
       parentNode.textContent = "";
+
       for (const child of newChildNodes) {
         parentNode.appendChild(child);
       }
+
       break;
     }
+  }
+}
+
+function formatFocusParentAnchor(
+  anchorNode,
+  focusNode,
+  anchorOffset,
+  focusOffset,
+  style
+) {
+  if (focusOffset === 0) {
+    console.log("focusOffset 0");
+    const affectedAnchorText = anchorNode.textContent.slice(0, anchorOffset);
+    const unaffectedAnchorText = anchorNode.textContent.slice(anchorOffset);
+    const affectedAnchorNode = document.createTextNode;
+    console.log("affected anchor text", affectedAnchorText);
+    const children = focusNode.childNodes;
+    const affectedChildren = [];
+
+    for (const child of children) {
+      affectedChildren.push(child);
+      if (child === anchorNode) {
+        break;
+      }
+    }
+
+    console.log(affectedChildren);
+    const newElement = document.createElement(style);
+  } else {
   }
 }
 

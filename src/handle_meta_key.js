@@ -4,9 +4,7 @@ export function handleMetaKey(e, state, editor) {
     b: true,
   };
   if (e.metaKey && state.metaPressed && formatMap[e.key]) {
-    if (e.key === "i") {
-    } else if (e.key === "b") {
-    }
+    e.preventDefault();
   } else if (e.metaKey) {
     state.metaPressed = true;
   } else {

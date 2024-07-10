@@ -1,3 +1,5 @@
+import { inlineTypes } from "./element_types.js";
+
 export function replaceFirstTextChild(editor, state) {
   const childNodes = editor.childNodes;
   const child = childNodes[0];

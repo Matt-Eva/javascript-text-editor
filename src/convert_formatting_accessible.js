@@ -1,12 +1,12 @@
-export async function convertToAccessibleFormatting(editor) {
+export async function convertToAccessibleFormatting(editor, state) {
   const childNodes = editor.childNodes;
-  await recursivelyCheckFormatting(childNodes);
+  await recursivelyCheckFormatting(childNodes, state);
 }
 
-async function recursivelyCheckFormatting(nodes) {
+async function recursivelyCheckFormatting(nodes, state) {
   for (const node of nodes) {
     const childNodes = node.childNodes;
-    await recursivelyCheckFormatting(childNodes);
+    await recursivelyCheckFormatting(childNodes, state);
     const newChildren = [...node.childNodes];
     const parentNode = node.parentNode;
     if (node.nodeName === "I") {

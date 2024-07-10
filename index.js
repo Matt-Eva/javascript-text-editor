@@ -48,10 +48,17 @@ function init() {
     }
 
     state.timeoutID = setTimeout(() => {
-      convertToAccessibleFormatting;
-    }, 1000);
+      convertToAccessibleFormatting(editor, state);
+      // if (state.focusedNode) {
+      //   console.log("focused node", state.focusedNode);
+      //   state.focusedNode.focus();
+      //   const range = state.focusedNode.createTextRange();
+      //   range.collapse(false);
+      //   range.select();
+      // }
+    }, 500);
 
-    // handleMetaKey(e, state, editor);
+    handleMetaKey(e, state, editor);
   });
 
   toolbar.addEventListener("mouseenter", () =>
