@@ -31,6 +31,7 @@ function init() {
     focusedNode: undefined,
     currentSelection: undefined,
     metaPressed: false,
+    timeoutID: null,
   };
 
   editor.addEventListener("mouseup", () => setCurrentSelection(state));
@@ -40,7 +41,16 @@ function init() {
     keyupFocus(state);
   });
 
-  editor.addEventListener("keydown", (e) => handleMetaKey(e, state, editor));
+  editor.addEventListener("keydown", (e) => {
+    if (state.timeoutID) {
+      console.log("clearing timeout");
+      clearTimeout(state.timeoutID);
+    }
+    state.timeoutID = setTimeout(() => {
+      console.log("saving");
+    }, 1000);
+    handleMetaKey(e, state, editor);
+  });
 
   toolbar.addEventListener("mouseenter", () =>
     replaceFirstTextChild(editor, state)
