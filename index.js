@@ -1,8 +1,6 @@
 import { blockTypes, inlineTypes } from "./src/element_types.js";
-import {
-  convertToAccessibleFormatting,
-  handleFormatting,
-} from "./src/handle_formatting.js";
+import { handleFormatting } from "./src/handle_formatting.js";
+import { convertToAccessibleFormatting } from "./src/convert_formatting_accessible.js";
 import { handleMetaKey } from "./src/handle_meta_key.js";
 import {
   keyupFocus,
@@ -51,7 +49,7 @@ function init() {
     }
     state.timeoutID = setTimeout(() => {
       console.log("saving");
-      convertToAccessibleFormatting(editor);
+      convertToAccessibleFormatting;
     }, 1000);
     handleMetaKey(e, state, editor);
   });
