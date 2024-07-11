@@ -4,17 +4,30 @@ import { convertToAccessibleFormatting } from "./convert_formatting_accessible.j
 export async function handleFormatting(state, editor, style) {
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
-  const newNodeOne = document.createElement("span");
-  const newNodeTwo = document.createElement("span");
   const fragment = range.extractContents();
-  newNodeOne.textContent = "Hello";
-  newNodeTwo.textContent = "World!";
-  range.insertNode(newNodeTwo);
-  range.insertNode(newNodeOne);
+  const rangeChildren = [];
+  for (const child of fragment.childNodes) {
+    const newNode = document.createElement("em");
+    if (child.childNodes.length !== 0) {
+      const nestedChildren = [...child.childNodes];
+      for (const nestedChild of nestedChildren) {
+        newNode.appendChild(nestedChild);
+      }
+    } else if (child.textContent !== "") {
+      newNode.textContent = child.textContent;
+    }
+    rangeChildren.push(newNode);
+  }
+
+  while (rangeChildren.length !== 0) {
+    const lastNode = rangeChildren.pop();
+    range.insertNode(lastNode);
+  }
+  // console.log("start container parent", range.startContainer);
+  // console.log("end container parent", range.endContainer);
+
   selection.removeAllRanges();
   selection.addRange(range);
-  // console.log("start container", range.startContainer);
-  // console.log("end container", range.endContainer);
   // const fragment = range.extractContents();
   // if (range.commonAncestorContainer !== editor) {
   //   const newNode = document.createElement("span");
@@ -40,40 +53,39 @@ export async function handleFormatting(state, editor, style) {
 
 // export async function handleFormatting(state, editor, style) {
 //   // await convertToAccessibleFormatting(editor);
-//   if (state.currentSelection && !state.currentSelection.isCollapsed) {
-//     let anchorNode = state.currentSelection.anchorNode;
-//     let focusNode = state.currentSelection.focusNode;
-//     const anchorOffset = state.currentSelection.anchorOffset;
-//     const focusOffset = state.currentSelection.focusOffset;
-//     console.log("range count", state.currentSelection.rangeCount);
-//     const range = state.currentSelection.getRangeAt(0);
-//     console.log(range);
-//     console.log("cloned range", range.cloneContents());
-//     console.log("focus length", focusNode.length);
+//   const selection = window.getSelection();
+//   const range = selection.getRangeAt(0);
+//   let anchorNode = selection.anchorNode;
+//   let focusNode = selection.focusNode;
+//   const anchorOffset = selection.anchorOffset;
+//   const focusOffset = selection.focusOffset;
+//   let newRangeBoundaries;
 
-//     const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
+//   const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
 
-//     if (parentMap.sameParent) {
-//       formatSameParent(
-//         state,
-//         editor,
-//         parentMap,
-//         anchorNode,
-//         focusNode,
-//         anchorOffset,
-//         focusOffset,
-//         style
-//       );
-//     } else {
-//       formatSeparateParent();
-//     }
-//     // await removeRedundantAdjacentNodes(editor);
-//     range.setStartBefore(parentMap.anchorParent.firstChild);
-//     range.setStartAfter(parentMap.focusParent.lastChild);
-//     const selection = window.getSelection();
-//     selection.removeAllRanges();
-//     selection.addRange(range);
+//   if (parentMap.sameParent) {
+//     newRangeBoundaries = await formatSameParent(
+//       state,
+//       editor,
+//       parentMap,
+//       anchorNode,
+//       focusNode,
+//       anchorOffset,
+//       focusOffset,
+//       style
+//     );
+//   } else {
+//     formatSeparateParent();
 //   }
+
+//   console.log(newRangeBoundaries);
+//   range.setStart(newRangeBoundaries.anchorNode, 0);
+//   range.setEnd(
+//     newRangeBoundaries.focusNode,
+//     newRangeBoundaries.focusNode.length
+//   );
+//   selection.removeAllRanges();
+//   selection.addRange(range);
 // }
 
 function checkSameParentNode(anchorNode, focusNode, editor) {
@@ -120,7 +132,7 @@ function formatSameParent(
   console.log("anchor offset", anchorOffset);
   console.log("focus offset", focusOffset);
   if (anchorNode === focusNode) {
-    formatSameNode(
+    return formatSameNode(
       state,
       anchorNode,
       focusNode,
@@ -128,7 +140,6 @@ function formatSameParent(
       focusOffset,
       style
     );
-    return;
   }
 
   const position = anchorNode.compareDocumentPosition(focusNode);
@@ -271,12 +282,11 @@ async function formatSameNode(
       break;
     }
   }
-  state.currentSelection.setBaseAndExtent(
-    replaceNode,
-    replaceNode.length,
-    replaceNode,
-    replaceNode.length
-  );
+
+  return {
+    focusNode: replaceNode,
+    anchorNode: replaceNode,
+  };
 }
 
 function formatSameParentFocusPreceding(
