@@ -2,8 +2,6 @@ export function keyupFocus(state) {
   const selection = window.getSelection();
   const anchorNode = selection.anchorNode;
   state.focusedNode = anchorNode;
-  console.log(state.focusedNode);
-  console.log(state.focusedNode.parentNode);
 }
 
 export function mousedownFocus(event, editor, state) {
