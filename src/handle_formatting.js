@@ -4,10 +4,10 @@ import { convertToAccessibleFormatting } from "./convert_formatting_accessible.j
 export async function handleFormatting(state, editor, style) {
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
-  let startContainer = range.startContainer;
-  let startOffset = range.startOffset;
-  let endContainer = range.endContainer;
-  let endOffset = range.endOffset;
+  const startContainer = range.startContainer;
+  const startOffset = range.startOffset;
+  const endContainer = range.endContainer;
+  const endOffset = range.endOffset;
   let finalRange = {};
   const fragment = range.extractContents();
   const fragmentChildren = fragment.childNodes;
@@ -30,15 +30,8 @@ export async function handleFormatting(state, editor, style) {
     );
   }
 
-  startContainer = finalRange.startContainer;
-  startOffset = finalRange.startOffset;
-  endContainer = finalRange.endContainer;
-  endOffset = finalRange.endOffset;
-
-  console.log("endContainer", endContainer);
-  range.setStart(startContainer, 0);
-  range.setEnd(endContainer, endOffset);
-  console.log("final range", range);
+  range.setStart(finalRange.startContainer, 0);
+  range.setEnd(finalRange.endContainer, 1);
 
   selection.removeAllRanges();
   selection.addRange(range);
@@ -60,9 +53,7 @@ function handleSameNode(
 
   const finalRange = {
     startContainer: newNode,
-    startOffset: 0,
     endContainer: newNode,
-    endOffset: 1,
   };
 
   return finalRange;
@@ -77,9 +68,7 @@ function handleMultipleNodes(
 ) {
   const finalNodes = {
     startContainer: undefined,
-    startOffset: 0,
     endContainer: undefined,
-    endOffset: 0,
   };
 
   for (let i = 0; i < fragmentChildren.length; i++) {
@@ -96,17 +85,13 @@ function handleMultipleNodes(
 
       finalNodes.startContainer = newNode;
     } else if (i === fragmentChildren.length - 1) {
-      const endOffset = fragmentChild.textContent.length - 1;
-
       range.setStart(endContainer, 0);
-      range.setEnd(endContainer, endOffset);
 
       newNode.textContent = fragmentChild.textContent;
 
       range.insertNode(newNode);
 
       finalNodes.endContainer = newNode;
-      finalNodes.endOffset = endOffset;
     } else {
       range.setStart(fragmentChild, 0);
       range.setEnd(fragmentChild, fragmentChild.textContent.length - 1);
