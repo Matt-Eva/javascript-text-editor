@@ -4,20 +4,25 @@ import { convertToAccessibleFormatting } from "./convert_formatting_accessible.j
 export async function handleFormatting(state, editor, style) {
   const selection = window.getSelection();
   const range = selection.getRangeAt(0);
-  const fragment = range.extractContents();
+  const fragment = range.cloneContents();
   const rangeChildren = [];
+  console.log("fragment children", fragment.childNodes);
   for (const child of fragment.childNodes) {
     const newNode = document.createElement("em");
-    if (child.childNodes.length !== 0) {
+    if (child.nodeName === "BR") {
+      rangeChildren.appendChild(child);
+    } else if (child.childNodes.length !== 0) {
       const nestedChildren = [...child.childNodes];
       for (const nestedChild of nestedChildren) {
         newNode.appendChild(nestedChild);
       }
+      rangeChildren.push(newNode);
     } else if (child.textContent !== "") {
       newNode.textContent = child.textContent;
+      rangeChildren.push(newNode);
     }
-    rangeChildren.push(newNode);
   }
+  console.log("range children", rangeChildren);
 
   while (rangeChildren.length !== 0) {
     const lastNode = rangeChildren.pop();
