@@ -4,7 +4,7 @@ export function replaceFirstTextChild(editor, state) {
   const childNodes = editor.childNodes;
   const child = childNodes[0];
 
-  if (child && child.nodeName === "#text") {
+  if (child && inlineTypes[child.nodeName]) {
     const relevantNodes = [child];
     let node = child.nextSibling;
     while (node && inlineTypes[node.nodeName]) {

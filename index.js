@@ -48,7 +48,8 @@ function init() {
     }
 
     state.timeoutID = setTimeout(() => {
-      convertToAccessibleFormatting(editor, state);
+      console.log("saving");
+      // convertToAccessibleFormatting(editor, state);
       // if (state.focusedNode) {
       //   console.log("focused node", state.focusedNode);
       //   state.focusedNode.focus();
@@ -56,7 +57,7 @@ function init() {
       //   range.collapse(false);
       //   range.select();
       // }
-    }, 500);
+    }, 1000);
 
     handleMetaKey(e, state, editor);
   });

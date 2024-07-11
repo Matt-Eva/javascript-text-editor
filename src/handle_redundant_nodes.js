@@ -1,13 +1,17 @@
 export async function removeRedundantAdjacentNodes(editor) {
   const children = editor.childNodes;
+  console.log(editor.childNodes);
   for (const child of children) {
+    console.log("child", child);
     const nestedChildren = child.childNodes;
+    console.log("nestedChildren", nestedChildren);
     const newChildren = await recursivelyRemoveRedundantNodes(nestedChildren);
 
     while (child.hasChildNodes()) {
       await child.removeChild(child.firstChild);
     }
 
+    console.log(newChildren);
     for (const newChild of newChildren) {
       await child.appendChild(newChild);
     }
