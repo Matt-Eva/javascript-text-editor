@@ -47,15 +47,17 @@ function init() {
       clearTimeout(state.timeoutID);
     }
 
-    state.timeoutID = setTimeout(() => {
+    state.timeoutID = setTimeout(async () => {
       console.log("saving");
-      // convertToAccessibleFormatting(editor, state);
-      // if (state.focusedNode) {
-      //   console.log("focused node", state.focusedNode);
-      //   state.focusedNode.focus();
-      //   const range = state.focusedNode.createTextRange();
-      //   range.collapse(false);
-      //   range.select();
+      // await convertToAccessibleFormatting(editor, state);
+      // if (state.focusedNode && state.currentSelection) {
+      //   // console.log(state.focusedNode);
+      //   // state.focusedNode.focus();
+      //   setCurrentSelection(state);
+      //   console.log(state.currentSelection);
+      //   state.currentSelection.selectionStart =
+      //     state.currentSelection.selectionEnd = state.focusedNode.length;
+      //   console.log(state.focusedNode.length);
       // }
     }, 1000);
 
