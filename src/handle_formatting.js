@@ -1,6 +1,25 @@
 import { removeRedundantAdjacentNodes } from "./handle_redundant_nodes.js";
 import { convertToAccessibleFormatting } from "./convert_formatting_accessible.js";
 
+// export async function handleFormatting(state, editor, style) {
+//   if (state.currentSelection && !state.currentSelection.isCollapsed) {
+//     const range = state.currentSelection.getRangeAt(0);
+//     const newNode = document.createElement(style);
+//     try {
+//       range.surroundContents(newNode);
+//     } catch (e) {
+//       const fragment = range.extractContents();
+//       newNode.appendChild(fragment);
+//       range.insertNode(newNode);
+//     }
+
+//     range.selectNode(newNode);
+//     state.currentSelection.removeAllRanges();
+//     state.currentSelection.addRange(range);
+//     newNode.focus();
+//   }
+// }
+
 export async function handleFormatting(state, editor, style) {
   // await convertToAccessibleFormatting(editor);
   if (state.currentSelection && !state.currentSelection.isCollapsed) {
@@ -8,8 +27,8 @@ export async function handleFormatting(state, editor, style) {
     let focusNode = state.currentSelection.focusNode;
     const anchorOffset = state.currentSelection.anchorOffset;
     const focusOffset = state.currentSelection.focusOffset;
-    console.log("anchorNode", anchorNode);
-    console.log("focusNode", focusNode);
+    console.log("range count", state.currentSelection.rangeCount);
+
     const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
 
     if (parentMap.sameParent) {
@@ -25,8 +44,8 @@ export async function handleFormatting(state, editor, style) {
     } else {
       formatSeparateParent();
     }
+    await removeRedundantAdjacentNodes(editor);
   }
-  removeRedundantAdjacentNodes(editor);
 }
 
 function checkSameParentNode(anchorNode, focusNode, editor) {
@@ -213,7 +232,6 @@ function formatSameNode(
       for (const child of newChildNodes) {
         parentNode.appendChild(child);
       }
-
       break;
     }
   }
