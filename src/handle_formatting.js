@@ -30,11 +30,11 @@ export async function handleFormatting(state, editor, style) {
     );
   }
 
-  range.setStart(finalRange.startContainer, 0);
-  range.setEnd(finalRange.endContainer, 1);
+  // range.setStart(finalRange.startContainer, 0);
+  // range.setEnd(finalRange.endContainer, 1);
 
-  selection.removeAllRanges();
-  selection.addRange(range);
+  // selection.removeAllRanges();
+  // selection.addRange(range);
 }
 
 function handleSameNode(
@@ -72,6 +72,7 @@ function handleMultipleNodes(
   };
 
   for (let i = 0; i < fragmentChildren.length; i++) {
+    console.log("fragment children", fragmentChildren);
     const fragmentChild = fragmentChildren[i];
     const range = new Range();
     const newNode = document.createElement(style);
@@ -92,13 +93,22 @@ function handleMultipleNodes(
       range.insertNode(newNode);
 
       finalNodes.endContainer = newNode;
-    } else {
-      range.setStart(fragmentChild, 0);
-      range.setEnd(fragmentChild, fragmentChild.textContent.length - 1);
+    }
+  }
+
+  for (let i = 0; i < fragmentChildren.length; i++) {
+    const fragmentChild = fragmentChildren[i];
+    const range = new Range();
+    const newNode = document.createElement(style);
+    if (i !== 0 && i !== fragmentChildren.length - 1) {
+      console.log("middle child", fragmentChild);
+      range.setStart(finalNodes.endContainer, 0);
 
       newNode.textContent = fragmentChild.textContent;
 
       range.insertNode(newNode);
+
+      console.log("middle child range", range);
     }
   }
 

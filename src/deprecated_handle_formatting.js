@@ -12,42 +12,42 @@
 //   editor.focus();
 // }
 
-// export async function handleFormatting(state, editor, style) {
-//   // await convertToAccessibleFormatting(editor);
-//   const selection = window.getSelection();
-//   const range = selection.getRangeAt(0);
-//   let anchorNode = selection.anchorNode;
-//   let focusNode = selection.focusNode;
-//   const anchorOffset = selection.anchorOffset;
-//   const focusOffset = selection.focusOffset;
-//   let newRangeBoundaries;
+async function handleFormatting(state, editor, style) {
+  // await convertToAccessibleFormatting(editor);
+  const selection = window.getSelection();
+  const range = selection.getRangeAt(0);
+  let anchorNode = selection.anchorNode;
+  let focusNode = selection.focusNode;
+  const anchorOffset = selection.anchorOffset;
+  const focusOffset = selection.focusOffset;
+  let newRangeBoundaries;
 
-//   const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
+  const parentMap = checkSameParentNode(anchorNode, focusNode, editor);
 
-//   if (parentMap.sameParent) {
-//     newRangeBoundaries = await formatSameParent(
-//       state,
-//       editor,
-//       parentMap,
-//       anchorNode,
-//       focusNode,
-//       anchorOffset,
-//       focusOffset,
-//       style
-//     );
-//   } else {
-//     formatSeparateParent();
-//   }
+  if (parentMap.sameParent) {
+    newRangeBoundaries = await formatSameParent(
+      state,
+      editor,
+      parentMap,
+      anchorNode,
+      focusNode,
+      anchorOffset,
+      focusOffset,
+      style
+    );
+  } else {
+    formatSeparateParent();
+  }
 
-//   console.log(newRangeBoundaries);
-//   range.setStart(newRangeBoundaries.anchorNode, 0);
-//   range.setEnd(
-//     newRangeBoundaries.focusNode,
-//     newRangeBoundaries.focusNode.length
-//   );
-//   selection.removeAllRanges();
-//   selection.addRange(range);
-// }
+  console.log(newRangeBoundaries);
+  range.setStart(newRangeBoundaries.anchorNode, 0);
+  range.setEnd(
+    newRangeBoundaries.focusNode,
+    newRangeBoundaries.focusNode.length
+  );
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
 
 function checkSameParentNode(anchorNode, focusNode, editor) {
   let anchorParent = anchorNode;
