@@ -17,6 +17,7 @@ export async function handleFormatting(state, editor, style) {
       startContainer,
       startOffset,
       endContainer,
+      endOffset,
       editor,
       style
     );
@@ -48,7 +49,7 @@ export async function handleFormatting(state, editor, style) {
   const finalRange = new Range();
 
   finalRange.setStart(finalRangeData.startContainer, 0);
-  finalRange.setEnd(endContainer, endOffset);
+  finalRange.setEnd(finalRangeData.endContainer, 1);
   console.log("final range", finalRange);
   // range.setStart(finalRange.startContainer, startOffset);
   // range.setEnd(finalRange.endContainer, 1);
@@ -61,6 +62,7 @@ async function iterateSiblings(
   startContainer,
   startOffset,
   endContainer,
+  endOffset,
   editor,
   style
 ) {
@@ -107,26 +109,39 @@ async function iterateSiblings(
   }
   console.log("finalIteratorNode", iteratorNode);
 
-  const startRange = new Range();
-  startRange.setStart(startContainer, startOffset);
   const immediateStartParent = startContainer.parentNode;
   const newStartElement = document.createElement(style);
   const beforeContent = startContainer.textContent.slice(0, startOffset);
   const beforeNode = document.createTextNode(beforeContent);
   newStartElement.textContent = startContainer.textContent.slice(startOffset);
-  while (immediateStartParent.hasChildNodes()) {
+
+  while (immediateStartParent.hasChildNodes() && whileCounter < 100) {
+    whileCounter++;
+    console.log("removing start node", immediateStartParent.firstChild);
     await immediateStartParent.removeChild(immediateStartParent.firstChild);
   }
   await immediateStartParent.appendChild(beforeNode);
   await immediateStartParent.appendChild(newStartElement);
 
-  console.log("new start element", newStartElement);
+  const immediateEndParent = endContainer.parentNode;
+  const newEndElement = document.createElement(style);
+  const afterContent = endContainer.textContent.slice(endOffset);
+  const afterNode = document.createTextNode(afterContent);
+  newEndElement.textContent = endContainer.textContent.slice(0, endOffset);
 
-  const endRange = new Range();
+  whileCounter = 0;
+  while (immediateEndParent.hasChildNodes() && whileCounter < 100) {
+    console.log("removing end node", immediateEndParent.firstChild);
+    await immediateEndParent.removeChild(immediateEndParent.firstChild);
+    whileCounter++;
+  }
+
+  await immediateEndParent.appendChild(newEndElement);
+  await immediateEndParent.appendChild(afterNode);
 
   return {
     startContainer: newStartElement,
-    endContiner: undefined,
+    endContainer: newEndElement,
   };
 }
 
