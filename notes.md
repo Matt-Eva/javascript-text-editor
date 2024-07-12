@@ -13,10 +13,12 @@ Features include making headers, italicizing, bolding, and underlining text, cen
 [x]Turn First Text Node Into Paragraph
 [x]Apply Header Styling
 [x]Preserve Formatting Across Header Changes
-[x]Apply Italics within Same Origin Node
-[x]Remove Italics within Same Origin Node
-[x]Merge immediately adjacent EM Nodes (using toolbar)
-[x]Convert non-accessible tags to accessible tags
+[x]Apply single styling format across paragraphs
+[x]Preserve current selection for cross paragraph formatting
+[]Apply styling format within same origin node
+[]Remove Italics within Same Origin Node
+[]Merge immediately adjacent EM Nodes (using toolbar)
+[]Convert non-accessible tags to accessible tags
 []Apply Cross Formatting Within Same Paragraph
 
 - Applying formatting across multiple paragraphs

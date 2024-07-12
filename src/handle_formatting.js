@@ -44,15 +44,10 @@ export async function handleFormatting(state, editor, style) {
   //     style
   //   );
   // }
-
-  console.log("final range start container", finalRangeData.startContainer);
   const finalRange = new Range();
 
   finalRange.setStart(finalRangeData.startContainer, 0);
   finalRange.setEnd(finalRangeData.endContainer, 1);
-  console.log("final range", finalRange);
-  // range.setStart(finalRange.startContainer, startOffset);
-  // range.setEnd(finalRange.endContainer, 1);
 
   selection.removeAllRanges();
   selection.addRange(finalRange);
@@ -88,12 +83,10 @@ async function iterateSiblings(
     endParent = endParent.parentNode;
     whileCounter++;
   }
-  console.log(whileCounter);
 
   let iteratorNode = startParent;
   whileCounter = 0;
   while (iteratorNode.nextSibling !== endParent && whileCounter < 100) {
-    console.log("iterating iterator node");
     iteratorNode = iteratorNode.nextSibling;
     const range = new Range();
     range.setStart(iteratorNode, 0);
@@ -107,8 +100,6 @@ async function iterateSiblings(
     range.insertNode(newNode);
     whileCounter++;
   }
-  console.log("finalIteratorNode", iteratorNode);
-
   const immediateStartParent = startContainer.parentNode;
   const newStartElement = document.createElement(style);
   const beforeContent = startContainer.textContent.slice(0, startOffset);
@@ -117,7 +108,6 @@ async function iterateSiblings(
 
   while (immediateStartParent.hasChildNodes() && whileCounter < 100) {
     whileCounter++;
-    console.log("removing start node", immediateStartParent.firstChild);
     await immediateStartParent.removeChild(immediateStartParent.firstChild);
   }
   await immediateStartParent.appendChild(beforeNode);
@@ -131,7 +121,6 @@ async function iterateSiblings(
 
   whileCounter = 0;
   while (immediateEndParent.hasChildNodes() && whileCounter < 100) {
-    console.log("removing end node", immediateEndParent.firstChild);
     await immediateEndParent.removeChild(immediateEndParent.firstChild);
     whileCounter++;
   }
