@@ -9,11 +9,11 @@ export async function handleFormatting(state, editor, style) {
   const endContainer = range.endContainer;
   const endOffset = range.endOffset;
 
-  let finalRange = {};
+  let finalRangeData = {};
   if (startContainer === endContainer) {
     handleSameNode;
   } else {
-    finalRange = iterateSiblings(
+    finalRangeData = await iterateSiblings(
       startContainer,
       startOffset,
       endContainer,
@@ -44,14 +44,20 @@ export async function handleFormatting(state, editor, style) {
   //   );
   // }
 
-  range.setStart(finalRange.startContainer, 0);
+  console.log("final range start container", finalRangeData.startContainer);
+  const finalRange = new Range();
+
+  finalRange.setStart(finalRangeData.startContainer, 0);
+  finalRange.setEnd(endContainer, endOffset);
+  console.log("final range", finalRange);
+  // range.setStart(finalRange.startContainer, startOffset);
   // range.setEnd(finalRange.endContainer, 1);
 
   selection.removeAllRanges();
-  selection.addRange(range);
+  selection.addRange(finalRange);
 }
 
-function iterateSiblings(
+async function iterateSiblings(
   startContainer,
   startOffset,
   endContainer,
@@ -93,7 +99,7 @@ function iterateSiblings(
     newNode.textContent = iteratorNode.textContent;
 
     while (iteratorNode.hasChildNodes()) {
-      iteratorNode.removeChild(iteratorNode.firstChild);
+      await iteratorNode.removeChild(iteratorNode.firstChild);
     }
 
     range.insertNode(newNode);
@@ -109,10 +115,14 @@ function iterateSiblings(
   const beforeNode = document.createTextNode(beforeContent);
   newStartElement.textContent = startContainer.textContent.slice(startOffset);
   while (immediateStartParent.hasChildNodes()) {
-    immediateStartParent.removeChild(immediateStartParent.firstChild);
+    await immediateStartParent.removeChild(immediateStartParent.firstChild);
   }
-  immediateStartParent.appendChild(beforeNode);
-  immediateStartParent.appendChild(newStartElement);
+  await immediateStartParent.appendChild(beforeNode);
+  await immediateStartParent.appendChild(newStartElement);
+
+  console.log("new start element", newStartElement);
+
+  const endRange = new Range();
 
   return {
     startContainer: newStartElement,
