@@ -62,7 +62,11 @@ function iterateSiblings(startContainer, endContainer, editor, style) {
     range.setStart(iteratorNode, 0);
     const newNode = document.createElement(style);
     newNode.textContent = iteratorNode.textContent;
+    while (iteratorNode.hasChildNodes()) {
+      iteratorNode.removeChild(iteratorNode.firstChild);
+    }
     range.insertNode(newNode);
+    // iteratorNode.parentNode.removeChild(iteratorNode);
     console.log("nestedIteratorNode", iteratorNode);
   }
   console.log("finalIteratorNode", iteratorNode);
