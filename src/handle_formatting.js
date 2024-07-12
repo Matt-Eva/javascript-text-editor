@@ -10,7 +10,18 @@ export async function handleFormatting(state, editor, style) {
   const endOffset = range.endOffset;
 
   let finalRange = {};
-  iterateSiblings(startContainer, endContainer, editor, style);
+  if (startContainer === endContainer) {
+    handleSameNode;
+  } else {
+    finalRange = iterateSiblings(
+      startContainer,
+      startOffset,
+      endContainer,
+      editor,
+      style
+    );
+  }
+
   // const fragment = range.extractContents();
   // const fragmentChildren = fragment.childNodes;
   // if (fragmentChildren.length === 1) {
@@ -33,43 +44,80 @@ export async function handleFormatting(state, editor, style) {
   //   );
   // }
 
-  // range.setStart(finalRange.startContainer, 0);
+  range.setStart(finalRange.startContainer, 0);
   // range.setEnd(finalRange.endContainer, 1);
 
-  // selection.removeAllRanges();
-  // selection.addRange(range);
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
-function iterateSiblings(startContainer, endContainer, editor, style) {
+function iterateSiblings(
+  startContainer,
+  startOffset,
+  endContainer,
+  editor,
+  style
+) {
   let startParent = startContainer;
   let endParent = endContainer;
 
-  while (!startParent.nextSibling && startParent.parentNode !== editor) {
+  let whileCounter = 0;
+  while (
+    !startParent.nextSibling &&
+    startParent.parentNode !== editor &&
+    whileCounter < 100
+  ) {
     startParent = startParent.parentNode;
+    whileCounter++;
   }
-  console.log("start parent", startParent);
-  console.log("start parent sibiling", startParent.nextSibling);
 
-  while (!endParent.previousSibling && endParent.parentNode !== editor) {
+  whileCounter = 0;
+  while (
+    !endParent.previousSibling &&
+    endParent.parentNode !== editor &&
+    whileCounter < 100
+  ) {
     endParent = endParent.parentNode;
+    whileCounter++;
   }
-  console.log("end parent", endParent);
+  console.log(whileCounter);
 
   let iteratorNode = startParent;
-  while (iteratorNode.nextSibling !== endParent) {
+  whileCounter = 0;
+  while (iteratorNode.nextSibling !== endParent && whileCounter < 100) {
+    console.log("iterating iterator node");
     iteratorNode = iteratorNode.nextSibling;
     const range = new Range();
     range.setStart(iteratorNode, 0);
     const newNode = document.createElement(style);
     newNode.textContent = iteratorNode.textContent;
+
     while (iteratorNode.hasChildNodes()) {
       iteratorNode.removeChild(iteratorNode.firstChild);
     }
+
     range.insertNode(newNode);
-    // iteratorNode.parentNode.removeChild(iteratorNode);
-    console.log("nestedIteratorNode", iteratorNode);
+    whileCounter++;
   }
   console.log("finalIteratorNode", iteratorNode);
+
+  const startRange = new Range();
+  startRange.setStart(startContainer, startOffset);
+  const immediateStartParent = startContainer.parentNode;
+  const newStartElement = document.createElement(style);
+  const beforeContent = startContainer.textContent.slice(0, startOffset);
+  const beforeNode = document.createTextNode(beforeContent);
+  newStartElement.textContent = startContainer.textContent.slice(startOffset);
+  while (immediateStartParent.hasChildNodes()) {
+    immediateStartParent.removeChild(immediateStartParent.firstChild);
+  }
+  immediateStartParent.appendChild(beforeNode);
+  immediateStartParent.appendChild(newStartElement);
+
+  return {
+    startContainer: newStartElement,
+    endContiner: undefined,
+  };
 }
 
 function handleSameNode(
