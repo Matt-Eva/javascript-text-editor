@@ -12,9 +12,9 @@ Keyboard shortcuts are not prohibited, although toolbar alternatives are also pr
 
 ## Inspiration / Alternatives
 
-The purpose of this editor is to serve as an immediate drop-in editor with all features-baked in.
+The purpose of this editor is to serve as an immediate drop-in editor with all features baked-in.
 
-If you're looking for browser / javascript based editors that offer a more plug-and-play approach, with greater extensibility and customizability, check out <a href="https://docs.slatejs.org/">Slate</a> and <a href="https://editorjs.io/getting-started/">Editor.js</a>!
+If you're looking for browser / javascript based editors that offer a more plug-and-play approach, with greater extensibility and customizability, check out <a href="https://docs.slatejs.org/">Slate</a> and <a href="https://editorjs.io/getting-started/">Editor.js</a>! EditorJS was the original inspiration for creating an editor that generates JSON output, and Slate is an excellent tool if you're working with React and really want to build out a powerful and robust editor!
 
 ## Styling
 
